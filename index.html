@@ -845,12 +845,22 @@ function addItem(type) {
   const ph = document.getElementById(p + '-phone').value.trim();
 
   if (!d || !h || !n || !dt) { alert('⚠ 필수 항목(동, 호수, 성명, 등록일)을 입력해주세요.'); return; }
-  
+
+  // 회원번호 중복 체크 (입력한 경우에만)
+  if (mem) {
+    const allRecords = [...gymData, ...parkData, ...lockerData];
+    const dup = allRecords.find(r => r.member === mem);
+    if (dup) {
+      alert(`⚠ 회원번호 [${mem}]는 이미 등록되어 있습니다.\n(${dup.dong}동 ${dup.ho}호 · ${dup.name})\n다른 번호를 입력해주세요.`);
+      return;
+    }
+  }
+
   const obj = { id: Date.now().toString(36), dong: d, ho: h, name: n, date: dt, member: mem, phone: ph, cancelDate: null };
   if (type === 'park') { obj.carnum = document.getElementById('p-carnum').value.trim(); parkData.push(obj); }
   else if (type === 'gym') gymData.push(obj);
   else lockerData.push(obj);
-  
+
   save(); renderList(type); alert('✅ 등록되었습니다.');
   document.getElementById(p + '-ho').value = ''; document.getElementById(p + '-name').value = ''; document.getElementById(p + '-member').value = ''; document.getElementById(p + '-phone').value = '';
 }
@@ -880,12 +890,14 @@ function renderList(type) {
   let head = `<thead><tr><th>동</th><th>호수</th><th>성명</th><th>회원번호</th><th>전화번호</th>${type === 'park' ? '<th>차량번호</th>' : ''}<th>등록일</th><th>해지일</th><th>관리</th></tr></thead>`;
   el.innerHTML = `<div class="tbl-wrap"><table>${head}<tbody>` +
     filtered.map(r => `<tr class="${r.cancelDate ? 'cancelled-row' : ''}">
-      <td>${r.dong}동</td><td>${r.ho}호</td><td>${r.name}</td>
-      <td>${r.member || '-'}</td><td>${r.phone || '-'}</td>
+      <td>${r.dong}동</td><td>${r.ho}호</td>
+      <td>${r.name} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-field="name" onclick="editField(this)">수정</button></td>
+      <td>${r.member || '-'}</td>
+      <td>${r.phone || '-'} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-field="phone" onclick="editField(this)">수정</button></td>
       ${type === 'park' ? `<td>${r.carnum || '-'}</td>` : ''}
-      <td>${r.date} <button class="btn btn-outline btn-sm no-print" onclick="editDate('${type}','${r.id}','reg')">수정</button></td>
-      <td>${r.cancelDate || '-'} <button class="btn btn-outline btn-sm no-print" onclick="editDate('${type}','${r.id}','can')">수정</button></td>
-      <td><button class="btn btn-red btn-sm no-print" onclick="cancelItem('${type}','${r.id}')">해지</button> <button class="btn btn-red btn-sm no-print" onclick="deleteItem('${type}','${r.id}')">삭제</button></td>
+      <td>${r.date} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-datetype="reg" onclick="editDateFromBtn(this)">수정</button></td>
+      <td>${r.cancelDate || '-'} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-datetype="can" onclick="editDateFromBtn(this)">수정</button></td>
+      <td><button class="btn btn-red btn-sm no-print" data-type="${type}" data-id="${r.id}" onclick="cancelItemFromBtn(this)">해지</button> <button class="btn btn-red btn-sm no-print" data-type="${type}" data-id="${r.id}" onclick="deleteItemFromBtn(this)">삭제</button></td>
     </tr>`).join('') + `</tbody></table></div>`;
 }
 
@@ -899,6 +911,49 @@ function editDate(type, id, dateType) {
   if (dateType === 'reg') item.date = newVal; else item.cancelDate = newVal;
   save(); renderList(type);
 }
+
+function editField(btn) {
+  const type  = btn.getAttribute('data-type');
+  const id    = btn.getAttribute('data-id');
+  const field = btn.getAttribute('data-field');
+  const srcData = type === 'gym' ? gymData : type === 'park' ? parkData : lockerData;
+  const item = srcData.find(r => r.id === id); if (!item) return;
+  const label = field === 'name' ? '성명' : '전화번호';
+  const newVal = prompt(`${label} 수정`, item[field] || '');
+  if (newVal === null) return;
+  const trimmed = newVal.trim();
+
+  // 회원번호가 있으면 전체 배열(헬스장·주차·사물함)에서 같은 회원번호 레코드 일괄 변경
+  const memberNo = item.member;
+  let syncCount = 0;
+  if (memberNo) {
+    const allArrays = [gymData, parkData, lockerData];
+    allArrays.forEach(arr => {
+      arr.forEach(r => {
+        if (r.member === memberNo && r.id !== id) {
+          r[field] = trimmed;
+          syncCount++;
+        }
+      });
+    });
+  }
+  item[field] = trimmed;
+  save();
+  // 세 탭 목록 모두 갱신
+  ['gym', 'park', 'locker'].forEach(t => {
+    if (document.getElementById(t + '-list')) renderList(t);
+  });
+  if (memberNo && syncCount > 0) {
+    alert(`✅ ${label}이(가) 수정되었습니다.\n회원번호 [${memberNo}]의 다른 등록(${syncCount}건)도 함께 일괄 변경되었습니다.`);
+  }
+}
+
+function editDateFromBtn(btn) {
+  editDate(btn.getAttribute('data-type'), btn.getAttribute('data-id'), btn.getAttribute('data-datetype'));
+}
+
+function cancelItemFromBtn(btn) { cancelItem(btn.getAttribute('data-type'), btn.getAttribute('data-id')); }
+function deleteItemFromBtn(btn) { deleteItem(btn.getAttribute('data-type'), btn.getAttribute('data-id')); }
 
 function cancelItem(type, id) {
   const dt = prompt('해지일 입력 (YYYY-MM-DD)', new Date().toISOString().slice(0, 10));
@@ -1137,6 +1192,5 @@ window.onload = () => {
     }, 3000); // 3초 후 자동 숨김
   });
 </script>
-
 </body>
 </html>
