@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APT시설 이용료 정산(업무용 ERP 솔루션)V38.BETA</title>
+<title>APT시설 이용료 정산(업무용 ERP 솔루션)V43.BETA</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* 고급스러운 디자인 및 다크모드 지원 CSS */
@@ -289,6 +289,29 @@ tbody tr:hover { background: var(--accent-light); }
 tbody tr:last-child td { border-bottom: none; }
 .tbl-empty { text-align: center; color: var(--text2); padding: 40px !important; font-style: italic; }
 .cancelled-row td { text-decoration: line-through; color: #999 !important; opacity: 0.6; }
+
+/* 세대 DB 관리 강조 (빨간색) */
+#nav-db { color: #c0392b !important; font-weight: 700 !important; }
+#nav-db:hover, #nav-db.active { background: #fdf0ef !important; color: #a32020 !important; border-left: 3px solid #c0392b !important; }
+.db-emphasis-header { background: linear-gradient(135deg, #c0392b, #e74c3c) !important; color: #fff !important; }
+.db-emphasis-header .card-title { color: #fff !important; }
+.db-notice { background: #fdf0ef; border: 1.5px solid #e74c3c; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #7b241c; font-weight: 600; }
+
+/* DB 불러오기 모달 */
+.db-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 4000; align-items: flex-start; justify-content: center; padding-top: 60px; }
+.db-modal-overlay.active { display: flex; }
+.db-modal-box { background: var(--card); border-radius: 14px; width: 95%; max-width: 620px; max-height: 75vh; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.3); overflow: hidden; }
+.db-modal-head { padding: 16px 20px; background: linear-gradient(135deg, #1a5c44, #1a7a5e); color: #fff; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.db-modal-head h3 { font-size: 15px; font-weight: 700; margin: 0; }
+.db-modal-head button { background: rgba(255,255,255,0.2); border: none; color: #fff; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; line-height: 28px; text-align: center; }
+.db-modal-search { padding: 12px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.db-modal-search input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: var(--card); color: var(--text); }
+.db-modal-list { overflow-y: auto; flex: 1; }
+.db-modal-list table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.db-modal-list thead th { background: var(--hover); padding: 9px 12px; font-weight: 700; text-align: left; position: sticky; top: 0; border-bottom: 1px solid var(--border); }
+.db-modal-list tbody tr { cursor: pointer; border-bottom: 1px solid var(--border); }
+.db-modal-list tbody tr:hover { background: var(--accent-light, #e6f5f0); }
+.db-modal-list tbody td { padding: 9px 12px; }
 .cancelled-row:hover { background: var(--red-light) !important; }
 
 /* Stat cards */
@@ -459,8 +482,8 @@ tbody tr:last-child td { border-bottom: none; }
 
 <div class="header no-print">
   <div class="header-left">
-    <h1>🏢APT시설 이용료 정산(업무용 ERP 솔루션)V38.beta</h1>
-    <p>구미옥계 더힐 아파트v38 last-sort</p>
+    <h1>🏢APT시설 이용료 정산(업무용 ERP 솔루션)V43.beta</h1>
+    <p>환경설정에서 요금부과설정 수정이 가능합니다</p>
   </div>
   <div class="header-right">
     <!-- 오늘의집 버튼 -->
@@ -479,7 +502,7 @@ tbody tr:last-child td { border-bottom: none; }
       <span id="theme-icon">🌙</span> <span id="theme-text">다크모드</span>
     </button>
     <div class="header-info">
-      <div id="header-세대">8개동 648세대</div>
+      <div id="header-세대"></div>
       <div id="header-date"></div>
     </div>
   </div>
@@ -530,7 +553,7 @@ tbody tr:last-child td { border-bottom: none; }
     <div id="page-dash" class="page active">
       <div id="dash-stat-grid" class="stat-grid"></div>
       <div class="card">
-        <div class="card-header"><div class="card-title">✨ v38 last-sort업데이트 안내</div></div>
+        <div class="card-header"><div class="card-title">✨ v38 업데이트 안내</div></div>
         <div style="line-height:1.8">
           <p>• <b>데이터 자동 정렬:</b> 등록 현황 리스트가 <b>동 -> 호수 -> 회원번호순으로 자동 SORT됩니다.</p>
           <p>• <b>다크모드 지원:</b> 상단 다크버튼을 통해 눈피로 방지 다크모드로 전환할 수 있습니다.</p>
@@ -546,6 +569,10 @@ tbody tr:last-child td { border-bottom: none; }
     <div id="page-gym" class="page">
       <div class="card">
         <div class="card-header"><div class="card-title">🏃 헬스장 이용료 등록</div></div>
+        <div style="margin-bottom:12px">
+          <button class="btn btn-blue" onclick="openDBModal('g')">📋 DB 불러오기 (세대 검색 → 선택)</button>
+          <span style="font-size:12px;color:var(--text2);margin-left:10px">세대 DB에서 입주민을 검색해 자동으로 정보를 불러옵니다</span>
+        </div>
         <div class="form-grid form-grid-6">
           <div class="form-group"><label>동</label><select id="g-dong"></select></div>
           <div class="form-group"><label>호수</label><input type="text" id="g-ho" onblur="autoFill('g')"></div>
@@ -569,6 +596,10 @@ tbody tr:last-child td { border-bottom: none; }
     <div id="page-park" class="page">
       <div class="card">
         <div class="card-header"><div class="card-title">🚗 주차 이용료 등록</div></div>
+        <div style="margin-bottom:12px">
+          <button class="btn btn-blue" onclick="openDBModal('p')">📋 DB 불러오기 (세대 검색 → 선택)</button>
+          <span style="font-size:12px;color:var(--text2);margin-left:10px">세대 DB에서 입주민을 검색해 자동으로 정보를 불러옵니다</span>
+        </div>
         <div class="form-grid form-grid-4">
           <div class="form-group"><label>동</label><select id="p-dong"></select></div>
           <div class="form-group"><label>호수</label><input type="text" id="p-ho" onblur="autoFill('p')"></div>
@@ -593,6 +624,10 @@ tbody tr:last-child td { border-bottom: none; }
     <div id="page-locker" class="page">
       <div class="card">
         <div class="card-header"><div class="card-title">📦 사물함 이용료 등록</div></div>
+        <div style="margin-bottom:12px">
+          <button class="btn btn-blue" onclick="openDBModal('l')">📋 DB 불러오기 (세대 검색 → 선택)</button>
+          <span style="font-size:12px;color:var(--text2);margin-left:10px">세대 DB에서 입주민을 검색해 자동으로 정보를 불러옵니다</span>
+        </div>
         <div class="form-grid form-grid-6">
           <div class="form-group"><label>동</label><select id="l-dong"></select></div>
           <div class="form-group"><label>호수</label><input type="text" id="l-ho" onblur="autoFill('l')"></div>
@@ -658,33 +693,46 @@ tbody tr:last-child td { border-bottom: none; }
 
     <!-- 세대 DB -->
     <div id="page-db" class="page">
+      <div class="db-notice">
+        ⚠ <b>세대 DB 관리는 최초 1회 반드시 입력해야 합니다.</b> 동·호수·성명·회원번호·전화번호를 등록하면 헬스장/주차/사물함 등록 시 DB에서 바로 불러와 사용할 수 있습니다.
+      </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">🏘️ 세대 정보 관리</div></div>
+        <div class="card-header db-emphasis-header">
+          <div class="card-title">🏘️ 세대 등록 / 수정</div>
+        </div>
+        <div class="form-grid form-grid-4" style="margin-top:14px">
+          <div class="form-group"><label>동 *</label><select id="db-dong-input"></select></div>
+          <div class="form-group"><label>호수 *</label><input type="text" id="db-ho-input" placeholder="예: 101"></div>
+          <div class="form-group"><label>성명 *</label><input type="text" id="db-name-input" placeholder="이름"></div>
+          <div class="form-group"><label>회원번호</label><input type="text" id="db-member-input" placeholder="고유 회원번호"></div>
+        </div>
         <div class="form-grid form-grid-4">
-          <div class="form-group"><label>동</label><select id="db-dong-input"></select></div>
-          <div class="form-group"><label>호수</label><input type="text" id="db-ho-input"></div>
-          <div class="form-group"><label>성명</label><input type="text" id="db-name-input"></div>
-          <div class="form-group"><label>전화번호</label><input type="text" id="db-phone-input"></div>
+          <div class="form-group"><label>전화번호</label><input type="text" id="db-phone-input" placeholder="010-0000-0000"></div>
+          <div class="form-group" style="align-self:flex-end">
+            <button class="btn btn-primary" style="width:100%" onclick="addDB()">등록 / 수정</button>
+          </div>
+          <div class="form-group" style="align-self:flex-end">
+            <button class="btn btn-outline" style="width:100%" onclick="clearDBForm()">입력창 비우기</button>
+          </div>
+          <div class="form-group" style="align-self:flex-end">
+            <button class="btn btn-blue" style="width:100%" onclick="autoGenDB()">전체 세대 자동생성</button>
+          </div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:10px">
-          <button class="btn btn-primary" onclick="addDB()">세대 등록/수정</button>
-          <button class="btn btn-outline" onclick="clearDBForm()">입력창 비우기</button>
-          <button class="btn btn-blue" onclick="autoGenDB()">전체 세대 자동생성 (648세대)</button>
-          <button class="btn btn-red" onclick="clearAllDB()">전체 삭제</button>
-        </div>
+        <div id="db-form-alert" style="margin-top:8px"></div>
       </div>
       <div class="card">
         <div class="card-header">
           <div class="card-title">🏘️ 세대 목록</div>
-          <div style="display:flex;gap:10px">
+          <div style="display:flex;gap:10px;align-items:center">
             <select id="db-dong-filter" onchange="renderDBList()" style="padding:5px;border-radius:4px;border:1px solid var(--border)"></select>
-            <input type="text" id="db-filter" placeholder="검색 (동, 호, 이름)" onkeyup="renderDBList()" style="padding:5px;border-radius:4px;border:1px solid var(--border)">
+            <input type="text" id="db-filter" placeholder="검색 (동, 호, 이름, 회원번호)" onkeyup="renderDBList()" style="padding:5px;border-radius:4px;border:1px solid var(--border)">
+            <button class="btn btn-red btn-sm" onclick="clearAllDB()">전체 삭제</button>
           </div>
         </div>
         <div id="db-count-bar" style="font-size:12px;margin-bottom:10px;color:var(--text2)"></div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>동</th><th>호수</th><th>성명</th><th>전화번호</th><th>등록일</th><th colspan="2">관리</th></tr></thead>
+            <thead><tr><th>동</th><th>호수</th><th>성명</th><th>회원번호</th><th>전화번호</th><th>등록일</th><th colspan="2">관리</th></tr></thead>
             <tbody id="db-tbody"></tbody>
           </table>
         </div>
@@ -694,7 +742,13 @@ tbody tr:last-child td { border-bottom: none; }
     <!-- 환경설정 -->
     <div id="page-settings" class="page">
       <div class="card">
-        <div class="card-header"><div class="card-title">⚙️ 부과 금액 및 정책 설정</div></div>
+        
+        <div class="card-header"><div class="card-title">🏢 아파트 기본 정보 설정</div></div>
+        <div class="form-grid form-grid-2" style="margin-bottom:20px">
+          <div class="form-group"><label>동 수</label><input type="number" id="s-buildings"></div>
+          <div class="form-group"><label>세대 수</label><input type="number" id="s-households"></div>
+        </div>
+<div class="card-header"><div class="card-title">⚙️ 부과 금액 및 정책 설정</div></div>
         <div class="form-grid form-grid-3">
           <div class="form-group"><label>헬스장 기본료</label><input type="number" id="s-gym-fee"></div>
           <div class="form-group"><label>기본 인원</label><input type="number" id="s-gym-base"></div>
@@ -748,7 +802,7 @@ tbody tr:last-child td { border-bottom: none; }
 <div id="pw-modal-overlay">
   <div id="pw-modal-box">
     <div style="font-weight:800;font-size:18px;margin-bottom:15px">🔐 환경설정 잠금</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:20px">관리자 비밀번호를 입력하세요</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:20px">관리자 비밀번호를 입력하세요<br>(문의:comdak119@naver.com)</div>
     <input id="pw-input" type="password" style="width:100%;padding:12px;text-align:center;border:1px solid var(--border);border-radius:8px;margin-bottom:15px;font-size:18px;letter-spacing:5px">
     <div id="pw-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:15px;font-weight:700">❌ 비밀번호가 일치하지 않습니다.</div>
     <div style="display:flex;gap:10px">
@@ -767,7 +821,7 @@ let gymData = JSON.parse(localStorage.getItem(KEYS.GYM) || '[]');
 let parkData = JSON.parse(localStorage.getItem(KEYS.PARK) || '[]');
 let lockerData = JSON.parse(localStorage.getItem(KEYS.LOCKER) || '[]');
 let dbData = JSON.parse(localStorage.getItem(KEYS.DB) || '[]');
-let cfg = JSON.parse(localStorage.getItem(KEYS.CFG) || '{"gymFee":10000,"gymAdd":5000,"gymBase":2,"parkFee":30000,"parkAdd":50000,"parkBase":2,"lockerFee":3000,"cutDay":20,"bank":"농협 000-0000-0000-00","phone":"054-000-0000"}');
+let cfg = JSON.parse(localStorage.getItem(KEYS.CFG) || '{"gymFee":10000,"gymAdd":5000,"gymBase":2,"parkFee":30000,"parkAdd":50000,"parkBase":2,"lockerFee":3000,"cutDay":20,"bank":"농협 000-0000-0000-00","phone":"054-000-0000","buildings":8,"households":648}');
 
 function save() {
   localStorage.setItem(KEYS.GYM, JSON.stringify(gymData));
@@ -845,12 +899,12 @@ function addItem(type) {
   const ph = document.getElementById(p + '-phone').value.trim();
 
   if (!d || !h || !n || !dt) { alert('⚠ 필수 항목(동, 호수, 성명, 등록일)을 입력해주세요.'); return; }
-  
+
   const obj = { id: Date.now().toString(36), dong: d, ho: h, name: n, date: dt, member: mem, phone: ph, cancelDate: null };
   if (type === 'park') { obj.carnum = document.getElementById('p-carnum').value.trim(); parkData.push(obj); }
   else if (type === 'gym') gymData.push(obj);
   else lockerData.push(obj);
-  
+
   save(); renderList(type); alert('✅ 등록되었습니다.');
   document.getElementById(p + '-ho').value = ''; document.getElementById(p + '-name').value = ''; document.getElementById(p + '-member').value = ''; document.getElementById(p + '-phone').value = '';
 }
@@ -880,12 +934,14 @@ function renderList(type) {
   let head = `<thead><tr><th>동</th><th>호수</th><th>성명</th><th>회원번호</th><th>전화번호</th>${type === 'park' ? '<th>차량번호</th>' : ''}<th>등록일</th><th>해지일</th><th>관리</th></tr></thead>`;
   el.innerHTML = `<div class="tbl-wrap"><table>${head}<tbody>` +
     filtered.map(r => `<tr class="${r.cancelDate ? 'cancelled-row' : ''}">
-      <td>${r.dong}동</td><td>${r.ho}호</td><td>${r.name}</td>
-      <td>${r.member || '-'}</td><td>${r.phone || '-'}</td>
+      <td>${r.dong}동</td><td>${r.ho}호</td>
+      <td>${r.name} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-field="name" onclick="editField(this)">수정</button></td>
+      <td>${r.member || '-'}</td>
+      <td>${r.phone || '-'} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-field="phone" onclick="editField(this)">수정</button></td>
       ${type === 'park' ? `<td>${r.carnum || '-'}</td>` : ''}
-      <td>${r.date} <button class="btn btn-outline btn-sm no-print" onclick="editDate('${type}','${r.id}','reg')">수정</button></td>
-      <td>${r.cancelDate || '-'} <button class="btn btn-outline btn-sm no-print" onclick="editDate('${type}','${r.id}','can')">수정</button></td>
-      <td><button class="btn btn-red btn-sm no-print" onclick="cancelItem('${type}','${r.id}')">해지</button> <button class="btn btn-red btn-sm no-print" onclick="deleteItem('${type}','${r.id}')">삭제</button></td>
+      <td>${r.date} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-datetype="reg" onclick="editDateFromBtn(this)">수정</button></td>
+      <td>${r.cancelDate || '-'} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-datetype="can" onclick="editDateFromBtn(this)">수정</button></td>
+      <td><button class="btn btn-red btn-sm no-print" data-type="${type}" data-id="${r.id}" onclick="cancelItemFromBtn(this)">해지</button> <button class="btn btn-red btn-sm no-print" data-type="${type}" data-id="${r.id}" onclick="deleteItemFromBtn(this)">삭제</button></td>
     </tr>`).join('') + `</tbody></table></div>`;
 }
 
@@ -899,6 +955,49 @@ function editDate(type, id, dateType) {
   if (dateType === 'reg') item.date = newVal; else item.cancelDate = newVal;
   save(); renderList(type);
 }
+
+function editField(btn) {
+  const type  = btn.getAttribute('data-type');
+  const id    = btn.getAttribute('data-id');
+  const field = btn.getAttribute('data-field');
+  const srcData = type === 'gym' ? gymData : type === 'park' ? parkData : lockerData;
+  const item = srcData.find(r => r.id === id); if (!item) return;
+  const label = field === 'name' ? '성명' : '전화번호';
+  const newVal = prompt(`${label} 수정`, item[field] || '');
+  if (newVal === null) return;
+  const trimmed = newVal.trim();
+
+  // 회원번호가 있으면 전체 배열(헬스장·주차·사물함)에서 같은 회원번호 레코드 일괄 변경
+  const memberNo = item.member;
+  let syncCount = 0;
+  if (memberNo) {
+    const allArrays = [gymData, parkData, lockerData];
+    allArrays.forEach(arr => {
+      arr.forEach(r => {
+        if (r.member === memberNo && r.id !== id) {
+          r[field] = trimmed;
+          syncCount++;
+        }
+      });
+    });
+  }
+  item[field] = trimmed;
+  save();
+  // 세 탭 목록 모두 갱신
+  ['gym', 'park', 'locker'].forEach(t => {
+    if (document.getElementById(t + '-list')) renderList(t);
+  });
+  if (memberNo && syncCount > 0) {
+    alert(`✅ ${label}이(가) 수정되었습니다.\n회원번호 [${memberNo}]의 다른 등록(${syncCount}건)도 함께 일괄 변경되었습니다.`);
+  }
+}
+
+function editDateFromBtn(btn) {
+  editDate(btn.getAttribute('data-type'), btn.getAttribute('data-id'), btn.getAttribute('data-datetype'));
+}
+
+function cancelItemFromBtn(btn) { cancelItem(btn.getAttribute('data-type'), btn.getAttribute('data-id')); }
+function deleteItemFromBtn(btn) { deleteItem(btn.getAttribute('data-type'), btn.getAttribute('data-id')); }
 
 function cancelItem(type, id) {
   const dt = prompt('해지일 입력 (YYYY-MM-DD)', new Date().toISOString().slice(0, 10));
@@ -1030,21 +1129,73 @@ function renderDB() {
   if (di && di.options.length <= 1) { di.innerHTML = '<option value="">선택</option>' + DONGS.map(d => `<option value="${d}">${d}동</option>`).join(''); }
   renderDBList();
 }
-function clearDBForm() { document.getElementById('db-dong-input').value = ''; document.getElementById('db-ho-input').value = ''; document.getElementById('db-name-input').value = ''; document.getElementById('db-phone-input').value = ''; }
+function clearDBForm() {
+  ['db-dong-input','db-ho-input','db-name-input','db-member-input','db-phone-input'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  const al = document.getElementById('db-form-alert'); if(al) al.innerHTML = '';
+}
 function addDB() {
-  const d = document.getElementById('db-dong-input').value, h = document.getElementById('db-ho-input').value, n = document.getElementById('db-name-input').value, p = document.getElementById('db-phone-input').value;
-  if (!d || !h || !n) { alert('동, 호수, 성명은 필수입니다.'); return; }
-  const existingIdx = dbData.findIndex(i => i.dong === d && i.ho === h);
-  if (existingIdx > -1) { dbData[existingIdx] = { ...dbData[existingIdx], name: n, phone: p }; } 
-  else { dbData.push({ dong: d, ho: h, name: n, phone: p, date: new Date().toISOString().split('T')[0] }); }
-  save(); clearDBForm(); renderDBList();
+  const d  = document.getElementById('db-dong-input').value;
+  const h  = document.getElementById('db-ho-input').value.trim();
+  const n  = document.getElementById('db-name-input').value.trim();
+  const mb = (document.getElementById('db-member-input').value || '').trim();
+  const ph = document.getElementById('db-phone-input').value.trim();
+  const al = document.getElementById('db-form-alert');
+  if (!d || !h || !n) { if(al) al.innerHTML = '<div style="color:#c0392b;font-size:13px;margin-top:6px">⚠ 동, 호수, 성명은 필수입니다.</div>'; return; }
+  if(al) al.innerHTML = '';
+
+  // 회원번호 중복 체크 (같은 동호수+이름이 아닌 다른 세대에 이미 등록된 경우)
+  if (mb) {
+    const dup = dbData.find(i => i.member === mb && !(i.dong === d && i.ho === h && i.name === n));
+    if (dup) { if(al) al.innerHTML = `<div style="color:#c0392b;font-size:13px;margin-top:6px">⚠ 회원번호 [${mb}]는 이미 ${dup.dong}동 ${dup.ho}호 (${dup.name})에 등록되어 있습니다.</div>`; return; }
+  }
+
+  // 동+호+이름 3가지 모두 일치 → 기존 레코드 수정 (전화번호·회원번호 업데이트)
+  const exactMatch = dbData.find(i => i.dong === d && i.ho === h && i.name === n);
+  if (exactMatch) {
+    const oldMember = exactMatch.member || '';
+    exactMatch.member = mb;
+    exactMatch.phone  = ph;
+    // gym/park/locker 동기화: 이름까지 일치하는 레코드만
+    [gymData, parkData, lockerData].forEach(arr => {
+      arr.forEach(r => {
+        if (r.dong === d && r.ho === h && r.name === n) { r.phone = ph; if(mb) r.member = mb; }
+        else if (mb && r.member === mb) { r.phone = ph; }
+        else if (oldMember && r.member === oldMember) { if(mb) r.member = mb; r.phone = ph; }
+      });
+    });
+    save(); renderDBList();
+    ['gym','park','locker'].forEach(t => { if(document.getElementById(t+'-list')) renderList(t); });
+    if(al) al.innerHTML = '<div style="color:#1a7a5e;font-size:13px;margin-top:6px">✅ 기존 구성원 정보가 수정되었습니다.</div>';
+    setTimeout(() => { if(al) al.innerHTML = ''; }, 3000);
+    return;
+  }
+
+  // 동+호가 같고 이름이 다름 → 가족구성원으로 누적 추가
+  const sameUnit = dbData.find(i => i.dong === d && i.ho === h);
+  if (sameUnit) {
+    // 가족구성원 추가 (신규 레코드 push)
+    dbData.push({ dong: d, ho: h, name: n, member: mb, phone: ph, date: new Date().toISOString().split('T')[0] });
+    save(); renderDBList();
+    ['gym','park','locker'].forEach(t => { if(document.getElementById(t+'-list')) renderList(t); });
+    const familyNames = dbData.filter(i => i.dong === d && i.ho === h).map(i => i.name).join(', ');
+    if(al) al.innerHTML = `<div style="color:#0b6ec8;font-size:13px;margin-top:6px">👨‍👩‍👧 ${d}동 ${h}호 가족구성원으로 추가되었습니다. (현재 구성원: ${familyNames})</div>`;
+    setTimeout(() => { if(al) al.innerHTML = ''; }, 4000);
+    return;
+  }
+
+  // 새 세대 신규 등록
+  dbData.push({ dong: d, ho: h, name: n, member: mb, phone: ph, date: new Date().toISOString().split('T')[0] });
+  save(); renderDBList();
+  ['gym','park','locker'].forEach(t => { if(document.getElementById(t+'-list')) renderList(t); });
+  if(al) al.innerHTML = '<div style="color:#1a7a5e;font-size:13px;margin-top:6px">✅ 신규 세대가 등록되었습니다.</div>';
+  setTimeout(() => { if(al) al.innerHTML = ''; }, 3000);
 }
 function deleteDB(idx) { if (!confirm('삭제하시겠습니까?')) return; dbData.splice(idx, 1); save(); renderDBList(); }
 function clearAllDB() { if (!confirm('정말 모든 세대 데이터를 초기화하시겠습니까?')) return; dbData = []; save(); renderDBList(); }
 function autoGenDB() {
   if (!confirm('648세대를 자동으로 생성하시겠습니까? (기존 데이터 유지)')) return;
   const dongs = ['101', '102', '103', '104', '105', '106', '107', '108'];
-  dongs.forEach(d => { for (let f = 1; f <= 18; f++) { for (let l = 1; l <= 5; l++) { const ho = (f * 100 + l).toString(); if (!dbData.find(i => i.dong === d && i.ho === ho)) { dbData.push({ dong: d, ho: ho, name: '', phone: '', date: new Date().toISOString().split('T')[0] }); } } } });
+  dongs.forEach(d => { for (let f = 1; f <= 18; f++) { for (let l = 1; l <= 5; l++) { const ho = (f * 100 + l).toString(); if (!dbData.find(i => i.dong === d && i.ho === ho)) { dbData.push({ dong: d, ho: ho, name: '', member: '', phone: '', date: new Date().toISOString().split('T')[0] }); } } } });
   save(); renderDBList();
 }
 function renderDBList() {
@@ -1052,29 +1203,142 @@ function renderDBList() {
   const dongFilter = document.getElementById('db-dong-filter').value;
   const tbody = document.getElementById('db-tbody'); if (!tbody) return;
   tbody.innerHTML = '';
-  const filtered = dbData.filter(i => { const matchText = !filter || (i.dong + i.ho + i.name + i.phone).includes(filter); const matchDong = !dongFilter || i.dong === dongFilter; return matchText && matchDong; });
-  filtered.sort((a, b) => a.dong.localeCompare(b.dong) || (parseInt(a.ho) - parseInt(b.ho)));
-  filtered.forEach((i, idx) => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${i.dong}동</td><td>${i.ho}호</td><td>${i.name}</td><td>${i.phone}</td><td>${i.date}</td><td><button class="btn btn-outline btn-sm" onclick="editDB('${i.dong}','${i.ho}')">수정</button></td><td><button class="btn btn-red btn-sm" onclick="deleteDBByInfo('${i.dong}','${i.ho}')">삭제</button></td>`; tbody.appendChild(tr); });
-  const countBar = document.getElementById('db-count-bar'); if (countBar) countBar.innerText = `총 ${filtered.length} 세대 등록됨`;
-}
-function editDB(dong, ho) { const i = dbData.find(item => item.dong === dong && item.ho === ho); if (!i) return; document.getElementById('db-dong-input').value = i.dong; document.getElementById('db-ho-input').value = i.ho; document.getElementById('db-name-input').value = i.name; document.getElementById('db-phone-input').value = i.phone; }
-function deleteDBByInfo(dong, ho) { if (!confirm('삭제하시겠습니까?')) return; const idx = dbData.findIndex(item => item.dong === dong && item.ho === ho); if (idx > -1) { dbData.splice(idx, 1); save(); renderDBList(); } }
+  const filtered = dbData.filter(i => {
+    const matchText = !filter || (i.dong + i.ho + i.name + (i.member||'') + (i.phone||'')).includes(filter);
+    const matchDong = !dongFilter || i.dong === dongFilter;
+    return matchText && matchDong;
+  });
+  filtered.sort((a, b) => a.dong.localeCompare(b.dong) || (parseInt(a.ho) - parseInt(b.ho)) || (a.name||'').localeCompare(b.name||''));
 
-function autoFill(p) { const d = document.getElementById(p + '-dong').value; const h = document.getElementById(p + '-ho').value.trim(); if (!d || !h) return; const i = dbData.find(r => r.dong === d && r.ho === h); if (i && i.name) { document.getElementById(p + '-name').value = i.name; const ph = document.getElementById(p + '-phone'); if (ph) ph.value = i.phone; } }
+  // 같은 동+호 그룹핑: 첫 번째 구성원만 동·호 표시, 가족은 병합 표시
+  let prevKey = null;
+  filtered.forEach((i, idx) => {
+    const key = i.dong + '-' + i.ho;
+    const isSameUnit = (key === prevKey);
+    const tr = document.createElement('tr');
+    // 같은 동호 두 번째 이후 구성원은 동·호 칸 비워서 그룹임을 시각적으로 표현
+    const dongCell = isSameUnit ? `<td style="color:var(--text2);padding-left:28px">└ 가족</td><td></td>` : `<td>${i.dong}동</td><td>${i.ho}호</td>`;
+    tr.innerHTML = `${dongCell}<td>${i.name||''}</td><td>${i.member||'-'}</td><td>${i.phone||'-'}</td><td>${i.date||''}</td>
+      <td><button class="btn btn-outline btn-sm" data-dong="${i.dong}" data-ho="${i.ho}" data-name="${(i.name||'').replace(/"/g,'&quot;')}" onclick="editDBFromBtn(this)">수정</button></td>
+      <td><button class="btn btn-red btn-sm" data-dong="${i.dong}" data-ho="${i.ho}" data-name="${(i.name||'').replace(/"/g,'&quot;')}" onclick="deleteDBFromBtn(this)">삭제</button></td>`;
+    tbody.appendChild(tr);
+    prevKey = key;
+  });
+
+  // 세대수는 고유 동+호 기준으로 산출
+  const uniqueUnits = new Set(dbData.map(i => i.dong + '-' + i.ho)).size;
+  const countBar = document.getElementById('db-count-bar');
+  if (countBar) countBar.innerText = `총 ${filtered.length}명 표시 (전체 ${dbData.length}명 / ${uniqueUnits}세대)`;
+}
+function editDBFromBtn(btn) {
+  const d = btn.getAttribute('data-dong'), h = btn.getAttribute('data-ho'), n = btn.getAttribute('data-name') || '';
+  // 동+호+이름으로 정확한 구성원 찾기 (가족구성원 구분)
+  const i = dbData.find(item => item.dong === d && item.ho === h && item.name === n)
+         || dbData.find(item => item.dong === d && item.ho === h);
+  if (!i) return;
+  document.getElementById('db-dong-input').value = i.dong;
+  document.getElementById('db-ho-input').value = i.ho;
+  document.getElementById('db-name-input').value = i.name || '';
+  document.getElementById('db-member-input').value = i.member || '';
+  document.getElementById('db-phone-input').value = i.phone || '';
+  document.getElementById('db-dong-input').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function editDB(dong, ho, name) { editDBFromBtn({ getAttribute: (k) => k==='data-dong'?dong : k==='data-ho'?ho : (name||'') }); }
+function deleteDBFromBtn(btn) {
+  const d = btn.getAttribute('data-dong'), h = btn.getAttribute('data-ho'), n = btn.getAttribute('data-name') || '';
+  if (!confirm(`${d}동 ${h}호 ${n ? '['+n+'] ' : ''}구성원을 삭제하시겠습니까?`)) return;
+  // 동+호+이름 기준으로 해당 구성원만 삭제
+  const idx = dbData.findIndex(item => item.dong === d && item.ho === h && item.name === n);
+  const fallbackIdx = idx === -1 ? dbData.findIndex(item => item.dong === d && item.ho === h) : -1;
+  const delIdx = idx > -1 ? idx : fallbackIdx;
+  if (delIdx > -1) { dbData.splice(delIdx, 1); save(); renderDBList(); }
+}
+function deleteDBByInfo(dong, ho, name) { deleteDBFromBtn({ getAttribute: (k) => k==='data-dong'?dong : k==='data-ho'?ho : (name||'') }); }
+
+// DB 불러오기 모달
+let _dbModalTarget = null;
+function openDBModal(prefix) {
+  _dbModalTarget = prefix;
+  document.getElementById('db-modal-search-input').value = '';
+  renderDBModal();
+  document.getElementById('db-modal-overlay').classList.add('active');
+  setTimeout(() => document.getElementById('db-modal-search-input').focus(), 100);
+}
+function closeDBModal() { document.getElementById('db-modal-overlay').classList.remove('active'); }
+function renderDBModal() {
+  const raw = document.getElementById('db-modal-search-input').value.trim();
+  const tbody = document.getElementById('db-modal-tbody');
+
+  // 검색어를 "동"/"호" 접미사 제거한 순수 값으로 정규화
+  const q = raw.replace(/[동호]/g, '').trim().toLowerCase();
+
+  const list = dbData.filter(i => {
+    if (!q) return true; // 검색어 없으면 전체 표시
+    const dong   = (i.dong  || '').toLowerCase();
+    const ho     = (i.ho    || '').toLowerCase();
+    const name   = (i.name  || '').toLowerCase();
+    const member = (i.member|| '').toLowerCase();
+    const phone  = (i.phone || '').toLowerCase();
+    // 동 번호만 입력(예: "101"), 이름, 회원번호, 호수, 전화번호 어느 하나라도 포함되면 검색
+    return dong.includes(q) || ho.includes(q) || name.includes(q) || member.includes(q) || phone.includes(q);
+  }).sort((a, b) => a.dong.localeCompare(b.dong) || (parseInt(a.ho) - parseInt(b.ho)));
+
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text2)">검색 결과가 없습니다. 세대 DB를 먼저 등록해 주세요.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(i =>
+    `<tr data-dong="${i.dong}" data-ho="${i.ho}" data-name="${(i.name||'').replace(/"/g,'&quot;')}" data-member="${i.member||''}" data-phone="${i.phone||''}" onclick="selectFromDB(this)">
+      <td>${i.dong}동</td><td>${i.ho}호</td><td><b>${i.name||''}</b></td><td>${i.member||'-'}</td><td>${i.phone||'-'}</td>
+    </tr>`
+  ).join('');
+}
+function selectFromDB(row) {
+  const p = _dbModalTarget;
+  if (!p) return;
+  const dong = row.getAttribute('data-dong');
+  const ho   = row.getAttribute('data-ho');
+  const name = row.getAttribute('data-name');
+  const mem  = row.getAttribute('data-member');
+  const ph   = row.getAttribute('data-phone');
+  const dongEl = document.getElementById(p+'-dong');
+  if (dongEl) { dongEl.value = dong; }
+  const hoEl = document.getElementById(p+'-ho');     if(hoEl)  hoEl.value  = ho;
+  const nmEl = document.getElementById(p+'-name');   if(nmEl)  nmEl.value  = name;
+  const mbEl = document.getElementById(p+'-member'); if(mbEl)  mbEl.value  = mem;
+  const phEl = document.getElementById(p+'-phone');  if(phEl)  phEl.value  = ph;
+  closeDBModal();
+}
+
+function autoFill(p) {
+  const d = document.getElementById(p+'-dong').value;
+  const h = document.getElementById(p+'-ho').value.trim();
+  if (!d || !h) return;
+  const i = dbData.find(r => r.dong === d && r.ho === h);
+  if (i && i.name) {
+    document.getElementById(p+'-name').value = i.name;
+    const ph = document.getElementById(p+'-phone'); if(ph) ph.value = i.phone||'';
+    const mb = document.getElementById(p+'-member'); if(mb) mb.value = i.member||'';
+  }
+}
 
 function loadSettings() {
   document.getElementById('s-gym-fee').value = cfg.gymFee; document.getElementById('s-gym-base').value = cfg.gymBase; document.getElementById('s-gym-add').value = cfg.gymAdd;
   document.getElementById('s-cut-day').value = cfg.cutDay; document.getElementById('s-park-fee').value = cfg.parkFee; document.getElementById('s-park-base').value = cfg.parkBase;
   document.getElementById('s-park-add').value = cfg.parkAdd; document.getElementById('s-locker-fee').value = cfg.lockerFee; document.getElementById('s-bank').value = cfg.bank; document.getElementById('s-phone').value = cfg.phone;
+  document.getElementById('s-buildings').value = cfg.buildings || 8;
+  document.getElementById('s-households').value = cfg.households || 648;
+  updateHeaderInfo();
   updateSettingsUI();
 }
-function updateSettingsUI() { document.getElementById('settings-summary').innerHTML = `• 헬스장: 기본 ${cfg.gymFee.toLocaleString()}원 (${cfg.gymBase}명까지) / 추가 ${cfg.gymAdd.toLocaleString()}원<br>• 주차: 기본 ${cfg.parkFee.toLocaleString()}원 (${cfg.parkBase}대까지) / 추가 ${cfg.parkAdd.toLocaleString()}원<br>• 사물함: 개당 ${cfg.lockerFee.toLocaleString()}원<br>• 부과기준: 매월 ${cfg.cutDay}일 이후 등록 시 다음 달부터 부과`; }
-function saveSettings() { cfg.gymFee = parseInt(document.getElementById('s-gym-fee').value); cfg.gymBase = parseInt(document.getElementById('s-gym-base').value); cfg.gymAdd = parseInt(document.getElementById('s-gym-add').value); cfg.cutDay = parseInt(document.getElementById('s-cut-day').value); cfg.parkFee = parseInt(document.getElementById('s-park-fee').value); cfg.parkBase = parseInt(document.getElementById('s-park-base').value); cfg.parkAdd = parseInt(document.getElementById('s-park-add').value); cfg.lockerFee = parseInt(document.getElementById('s-locker-fee').value); cfg.bank = document.getElementById('s-bank').value; cfg.phone = document.getElementById('s-phone').value; save(); updateSettingsUI(); alert('✅ 설정이 저장되었습니다.'); }
-function resetSettings() { if (!confirm('기본값으로 초기화하시겠습니까?')) return; cfg = { "gymFee": 10000, "gymAdd": 5000, "gymBase": 2, "parkFee": 30000, "parkAdd": 50000, "parkBase": 2, "lockerFee": 3000, "cutDay": 20, "bank": "농협 000-0000-0000-00", "phone": "054-000-0000" }; save(); loadSettings(); }
+function updateHeaderInfo(){document.getElementById('header-세대').textContent=`${cfg.buildings||8}개동 ${cfg.households||648}세대`;}
+function updateSettingsUI() { document.getElementById('settings-summary').innerHTML = `• 아파트 정보: ${cfg.buildings||8}개동 / ${cfg.households||648}세대<br>• 헬스장: 기본 ${cfg.gymFee.toLocaleString()}원 (${cfg.gymBase}명까지) / 추가 ${cfg.gymAdd.toLocaleString()}원<br>• 주차: 기본 ${cfg.parkFee.toLocaleString()}원 (${cfg.parkBase}대까지) / 추가 ${cfg.parkAdd.toLocaleString()}원<br>• 사물함: 개당 ${cfg.lockerFee.toLocaleString()}원<br>• 부과기준: 매월 ${cfg.cutDay}일 이후 등록 시 다음 달부터 부과`; }
+function saveSettings() { cfg.gymFee = parseInt(document.getElementById('s-gym-fee').value); cfg.gymBase = parseInt(document.getElementById('s-gym-base').value); cfg.gymAdd = parseInt(document.getElementById('s-gym-add').value); cfg.cutDay = parseInt(document.getElementById('s-cut-day').value); cfg.parkFee = parseInt(document.getElementById('s-park-fee').value); cfg.parkBase = parseInt(document.getElementById('s-park-base').value); cfg.parkAdd = parseInt(document.getElementById('s-park-add').value); cfg.lockerFee = parseInt(document.getElementById('s-locker-fee').value); cfg.bank = document.getElementById('s-bank').value; cfg.phone = document.getElementById('s-phone').value; cfg.buildings=parseInt(document.getElementById('s-buildings').value)||0; cfg.households=parseInt(document.getElementById('s-households').value)||0; save(); updateHeaderInfo(); updateSettingsUI(); alert('✅ 설정이 저장되었습니다.'); }
+function resetSettings() { if (!confirm('기본값으로 초기화하시겠습니까?')) return; cfg = { "gymFee": 10000, "gymAdd": 5000, "gymBase": 2, "parkFee": 30000, "parkAdd": 50000, "parkBase": 2, "lockerFee": 3000, "cutDay": 20, "bank": "농협 000-0000-0000-00", "phone": "054-000-0000", "buildings":8, "households":648 }; save(); loadSettings(); updateHeaderInfo(); }
 
 function exportBackup() { const blob = new Blob([JSON.stringify({ gym: gymData, park: parkData, locker: lockerData, db: dbData, cfg: cfg })], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `아파트관리_백업_${new Date().toISOString().slice(0, 10)}.json`; a.click(); }
 function importBackup(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { try { const d = JSON.parse(ev.target.result); gymData = d.gym || []; parkData = d.park || []; lockerData = d.locker || []; dbData = d.db || []; cfg = d.cfg || cfg; save(); alert('✅ 데이터 복구가 완료되었습니다.'); location.reload(); } catch(err) { alert('❌ 올바른 백업 파일이 아닙니다.'); } }; r.readAsText(f); }
-function renderDash() { document.getElementById('dash-stat-grid').innerHTML = `<div class="stat-card green"><div class="s-label">🏃 헬스장 이용</div><div class="s-val">${gymData.filter(r => !r.cancelDate).length}명</div></div><div class="stat-card blue"><div class="s-label">🚗 주차 등록</div><div class="s-val">${parkData.filter(r => !r.cancelDate).length}대</div></div><div class="stat-card purple"><div class="s-label">📦 사물함 사용</div><div class="s-val">${lockerData.filter(r => !r.cancelDate).length}개</div></div><div class="stat-card amber"><div class="s-label">🏘️ 전체 세대</div><div class="s-val">${dbData.length}세대</div></div>`; }
+function renderDash() { const uniqueUnits = new Set(dbData.map(i => i.dong + '-' + i.ho)).size; document.getElementById('dash-stat-grid').innerHTML = `<div class="stat-card green"><div class="s-label">🏃 헬스장 이용</div><div class="s-val">${gymData.filter(r => !r.cancelDate).length}명</div></div><div class="stat-card blue"><div class="s-label">🚗 주차 등록</div><div class="s-val">${parkData.filter(r => !r.cancelDate).length}대</div></div><div class="stat-card purple"><div class="s-label">📦 사물함 사용</div><div class="s-val">${lockerData.filter(r => !r.cancelDate).length}개</div></div><div class="stat-card amber"><div class="s-label">🏘️ 전체 세대</div><div class="s-val">${uniqueUnits}세대</div></div>`; }
 
 function exportToExcel() {
   const ym = document.getElementById('e-month').value; if(!ym) { alert('연월을 선택하세요.'); return; }
@@ -1111,7 +1375,26 @@ window.onload = () => {
 };
 </script>
 
-<style>
+<!-- DB 불러오기 모달 -->
+<div class="db-modal-overlay no-print" id="db-modal-overlay" onclick="if(event.target===this) closeDBModal()">
+  <div class="db-modal-box">
+    <div class="db-modal-head">
+      <h3 id="db-modal-title">📋 세대 DB 검색</h3>
+      <button onclick="closeDBModal()">✕</button>
+    </div>
+    <div class="db-modal-search">
+      <input type="text" id="db-modal-search-input" placeholder="동번호(101), 호수(101), 이름, 회원번호 중 하나만 입력..." oninput="renderDBModal()">
+    </div>
+    <div class="db-modal-list">
+      <table>
+        <thead><tr><th>동</th><th>호수</th><th>성명</th><th>회원번호</th><th>전화번호</th></tr></thead>
+        <tbody id="db-modal-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+// 우마우스금지
+    <style>
   #donation-banner {
     display: none;
     position: fixed;
@@ -1126,7 +1409,7 @@ window.onload = () => {
   }
 </style>
 
-<div id="donation-banner">☕ 커피 한잔 후원으로 개발자를 응원해주세요!</div>
+<div id="donation-banner">☕ 코드보기는 금지되어있습니다!</div>
 
 <script>
   document.addEventListener('contextmenu', function(event) {
@@ -1138,5 +1421,6 @@ window.onload = () => {
     }, 3000); // 3초 후 자동 숨김
   });
 </script>
+    
 </body>
 </html>
