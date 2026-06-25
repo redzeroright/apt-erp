@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APT시설 이용료 정산(업무용 ERP 솔루션)V43.BETA</title>
+<title>APT시설 이용료 정산(업무용 ERP 솔루션)V44.BETA</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* 고급스러운 디자인 및 다크모드 지원 CSS */
@@ -482,7 +482,7 @@ tbody tr:last-child td { border-bottom: none; }
 
 <div class="header no-print">
   <div class="header-left">
-    <h1>🏢APT시설 이용료 정산(업무용 ERP 솔루션)V43.beta</h1>
+    <h1>🏢APT시설 이용료 정산(업무용 ERP 솔루션)V44.beta</h1>
     <p>환경설정에서 요금부과설정 수정이 가능합니다</p>
   </div>
   <div class="header-right">
@@ -553,14 +553,16 @@ tbody tr:last-child td { border-bottom: none; }
     <div id="page-dash" class="page active">
       <div id="dash-stat-grid" class="stat-grid"></div>
       <div class="card">
-        <div class="card-header"><div class="card-title">✨ v38 업데이트 안내</div></div>
+        <div class="card-header"><div class="card-title">✨ v44 업데이트 안내</div></div>
         <div style="line-height:1.8">
-          <p>• <b>데이터 자동 정렬:</b> 등록 현황 리스트가 <b>동 -> 호수 -> 회원번호순으로 자동 SORT됩니다.</p>
-          <p>• <b>다크모드 지원:</b> 상단 다크버튼을 통해 눈피로 방지 다크모드로 전환할 수 있습니다.</p>
-          <p>• <b>유튜브 링크:</b> 프로그램 제작에 도움이 됩니다. 서명클릭후 유튜브 채널(구독,좋아요)</p>
-          <p>• <b>카카오 문의 추가:</b> 우측 상단에 카카오채널 [문의] 버튼이 추가되었습니다.</p>
-          <p>• <b>세대별합산요약:</b> 등록인원전체표시,회원번호.전화번호표시,세대전체삭제버튼추가.엑셀내보내기수정.</p>
-          <p>• <b>데이터삭제주의:</b> PC를 교체하거나 브라우저 초기화시 데이터 내보내기(JSON)', '데이터 가져오기', '엑셀 파일 다운로드' 기능을 꼭 사용하십시요</p>          
+          <p>• <b>버그 수정 (v44):</b> 아래 항목들이 수정되었습니다.</p>
+          <p>• <b>동 드롭다운 동기화:</b> 환경설정에서 동 수 변경 시 모든 동 선택 드롭다운이 즉시 갱신됩니다.</p>
+          <p>• <b>전체 세대 자동생성:</b> 648세대 고정이 아닌 환경설정의 <b>동 수 / 세대 수</b>를 기반으로 동적 생성됩니다.</p>
+          <p>• <b>호수 정렬 오류 수정:</b> 조회/고지서 출력에서 호수가 문자순(201 &lt; 99) 대신 숫자순(99 &lt; 201)으로 올바르게 정렬됩니다.</p>
+          <p>• <b>항목 선택 필터 적용:</b> 부과 통합 조회에서 '헬스장/주차/사물함' 항목 선택이 실제 조회 결과에 반영됩니다.</p>
+          <p>• <b>해지 관리 페이지 스타일 수정:</b> 헬스장/주차/사물함 해지 관리 페이지 헤더가 정상 표시됩니다.</p>
+          <p>• <b>세대 DB 드롭다운 누락 수정:</b> 초기 로드 시 세대 DB 필터 드롭다운도 올바르게 초기화됩니다.</p>
+          <p>• <b>데이터삭제주의:</b> PC를 교체하거나 브라우저 초기화시 '데이터 내보내기(JSON)', '데이터 가져오기', '엑셀 파일 다운로드' 기능을 꼭 사용하십시오.</p>
         </div>
       </div>
     </div>
@@ -648,9 +650,9 @@ tbody tr:last-child td { border-bottom: none; }
     </div>
 
     <!-- 해지 관리 -->
-    <div id="page-gymcancel" class="page"><div class="card"><div class="card-title">🏃 헬스장 해지 처리</div><div id="gym-cancel-list"></div></div></div>
-    <div id="page-parkcancel" class="page"><div class="card"><div class="card-title">🚗 주차 해지 처리</div><div id="park-cancel-list"></div></div></div>
-    <div id="page-lockercancel" class="page"><div class="card"><div class="card-title">📦 사물함 해지 처리</div><div id="locker-cancel-list"></div></div></div>
+    <div id="page-gymcancel" class="page"><div class="card"><div class="card-header"><div class="card-title">🏃 헬스장 해지 처리</div></div><div id="gym-cancel-list"></div></div></div>
+    <div id="page-parkcancel" class="page"><div class="card"><div class="card-header"><div class="card-title">🚗 주차 해지 처리</div></div><div id="park-cancel-list"></div></div></div>
+    <div id="page-lockercancel" class="page"><div class="card"><div class="card-header"><div class="card-title">📦 사물함 해지 처리</div></div><div id="locker-cancel-list"></div></div></div>
 
     <!-- 조회/출력 -->
     <div id="page-query" class="page">
@@ -769,7 +771,7 @@ tbody tr:last-child td { border-bottom: none; }
         </div>
         <div id="settings-summary" class="alert alert-info" style="margin-top:20px"></div>
       </div>
-      <div class="card"><div class="card-title">📥 데이터 백업 및 복구</div>
+      <div class="card"><div class="card-header"><div class="card-title">📥 데이터 백업 및 복구</div></div>
         <div style="display:flex;gap:10px;margin-top:15px">
           <button class="btn btn-blue" onclick="exportBackup()">데이터 내보내기 (JSON)</button>
           <label class="btn btn-outline" style="cursor:pointer">데이터 가져오기<input type="file" style="display:none" onchange="importBackup(event)"></label>
@@ -781,7 +783,7 @@ tbody tr:last-child td { border-bottom: none; }
   <!-- 하단 광고 바 -->
   <div class="bottom-ad-bar no-print" id="bottom-ad-container">
     <div id="bottom-ad-content" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
-      <a href="https://bitl.bz/Ji4byK" target="_blank" rel="noopener noreferrer" class="ad-skeleton">🎁매일 새로운 특가</a>
+      <a href="https://bitl.bz/Ji4byK" target="_blank" rel="noopener noreferrer" class="ad-skeleton">🏠 아파트 관리용품 할인 🎁매일 새로운 특가 🔥 시설관리 추천 공구 특가 🔧 전기·통신 기술자 추천장비</a>
     </div>
     <button class="coffee-donate-btn" onclick="document.getElementById('coffee-modal-overlay').classList.add('active')">
       <span class="cup">☕</span><span>커피한잔후원</span>
@@ -814,7 +816,6 @@ tbody tr:last-child td { border-bottom: none; }
 
 <script>
 const KEYS = { GYM: 'apt_gym_v23', PARK: 'apt_park_v23', LOCKER: 'apt_locker_v23', DB: 'apt_db_v23', CFG: 'apt_cfg_v23', THEME: 'apt_theme_v23' };
-const DONGS = ['101', '102', '103', '104', '105', '106', '107', '108'];
 const SETTINGS_PW = '0217';
 
 let gymData = JSON.parse(localStorage.getItem(KEYS.GYM) || '[]');
@@ -822,6 +823,18 @@ let parkData = JSON.parse(localStorage.getItem(KEYS.PARK) || '[]');
 let lockerData = JSON.parse(localStorage.getItem(KEYS.LOCKER) || '[]');
 let dbData = JSON.parse(localStorage.getItem(KEYS.DB) || '[]');
 let cfg = JSON.parse(localStorage.getItem(KEYS.CFG) || '{"gymFee":10000,"gymAdd":5000,"gymBase":2,"parkFee":30000,"parkAdd":50000,"parkBase":2,"lockerFee":3000,"cutDay":20,"bank":"농협 000-0000-0000-00","phone":"054-000-0000","buildings":8,"households":648}');
+
+// 동 배열: cfg.buildings 기반으로 동적 생성 (101, 102, ..., 1xx)
+let DONGS = [];
+function rebuildDongs() {
+  const n = cfg.buildings || 8;
+  DONGS = Array.from({ length: n }, (_, i) => String(101 + i));
+  const dongOpts      = '<option value="">선택</option>' + DONGS.map(d => `<option value="${d}">${d}동</option>`).join('');
+  const dongFilterOpts= '<option value="">전체 동</option>' + DONGS.map(d => `<option value="${d}">${d}동</option>`).join('');
+  ['g-dong','p-dong','l-dong','q-dong','b-dong','db-dong-input'].forEach(id => { const el = document.getElementById(id); if(el) el.innerHTML = dongOpts; });
+  const df = document.getElementById('db-dong-filter'); if(df) df.innerHTML = dongFilterOpts;
+}
+rebuildDongs();
 
 function save() {
   localStorage.setItem(KEYS.GYM, JSON.stringify(gymData));
@@ -1043,10 +1056,11 @@ function runIntegratedQuery() {
   const ym = document.getElementById('q-month').value;
   const d = document.getElementById('q-dong').value;
   const h = document.getElementById('q-ho').value.trim();
+  const typeFilter = document.getElementById('q-type').value; // 'gym'|'park'|'locker'|''
   if (!ym) { alert('연월을 선택하세요.'); return; }
-  const gyms = gymData.filter(r => isActive(r, ym, true) && (!d || r.dong === d) && (!h || r.ho === h));
-  const parks = parkData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h));
-  const lockers = lockerData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h));
+  const gyms   = typeFilter && typeFilter !== 'gym'    ? [] : gymData.filter(r => isActive(r, ym, true) && (!d || r.dong === d) && (!h || r.ho === h));
+  const parks  = typeFilter && typeFilter !== 'park'   ? [] : parkData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h));
+  const lockers= typeFilter && typeFilter !== 'locker' ? [] : lockerData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h));
   const house = {};
   gyms.forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].gc++; house[k].members.push({ type: '헬스장', name: r.name, member: r.member, phone: r.phone, id: r.id }); });
   parks.forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].pc++; house[k].members.push({ type: '주차', name: r.name, member: r.member, phone: r.phone, id: r.id, carnum: r.carnum }); });
@@ -1065,7 +1079,7 @@ function runIntegratedQuery() {
       <div class="stat-card amber"><div class="s-label">전체 합계</div><div class="s-val">${(gTotal + pTotal + lTotal).toLocaleString()}원</div></div>
     </div>
     <div class="card"><div class="card-title">🏘️ 세대별 합산 요약 (등록 인원 전체)</div><div class="tbl-wrap"><table><thead><tr><th>삭제</th><th>동</th><th>호수</th><th>구분</th><th>성명</th><th>회원번호</th><th>전화번호</th><th>헬스장</th><th>주차</th><th>사물함</th><th>합계</th></tr></thead><tbody>` +
-    Object.values(house).sort((a, b) => a.dong === b.dong ? a.ho.localeCompare(b.ho) : a.dong.localeCompare(b.dong)).map(v => {
+    Object.values(house).sort((a, b) => a.dong === b.dong ? ((parseInt(a.ho)||0) - (parseInt(b.ho)||0)) : a.dong.localeCompare(b.dong)).map(v => {
       const rowspan = v.members.length || 1;
       const houseTotal = (v.g + v.p + v.l).toLocaleString();
       if (!v.members.length) {
@@ -1106,7 +1120,7 @@ function generateBills() {
   parkData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, name: r.name, gc: 0, pc: 0, lc: 0 }; house[k].pc++; });
   lockerData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, name: r.name, gc: 0, pc: 0, lc: 0 }; house[k].lc++; });
   let html = '';
-  Object.values(house).sort((a, b) => a.dong === b.dong ? a.ho.localeCompare(b.ho) : a.dong.localeCompare(b.dong)).forEach(v => {
+  Object.values(house).sort((a, b) => a.dong === b.dong ? ((parseInt(a.ho)||0) - (parseInt(b.ho)||0)) : a.dong.localeCompare(b.dong)).forEach(v => {
     const gFee = v.gc <= cfg.gymBase ? (v.gc > 0 ? cfg.gymFee : 0) : cfg.gymFee + (v.gc - cfg.gymBase) * cfg.gymAdd;
     const pFee = v.pc <= cfg.parkBase ? (v.pc > 0 ? cfg.parkFee : 0) : cfg.parkFee + (v.pc - cfg.parkBase) * cfg.parkAdd;
     const lFee = v.lc * cfg.lockerFee;
@@ -1124,9 +1138,9 @@ function generateBills() {
 
 function renderDB() {
   const df = document.getElementById('db-dong-filter');
-  if (df && df.options.length <= 1) { df.innerHTML = '<option value="">전체 동</option>' + DONGS.map(d => `<option value="${d}">${d}동</option>`).join(''); }
+  if (df) { df.innerHTML = '<option value="">전체 동</option>' + DONGS.map(d => `<option value="${d}">${d}동</option>`).join(''); }
   const di = document.getElementById('db-dong-input');
-  if (di && di.options.length <= 1) { di.innerHTML = '<option value="">선택</option>' + DONGS.map(d => `<option value="${d}">${d}동</option>`).join(''); }
+  if (di) { di.innerHTML = '<option value="">선택</option>' + DONGS.map(d => `<option value="${d}">${d}동</option>`).join(''); }
   renderDBList();
 }
 function clearDBForm() {
@@ -1193,9 +1207,25 @@ function addDB() {
 function deleteDB(idx) { if (!confirm('삭제하시겠습니까?')) return; dbData.splice(idx, 1); save(); renderDBList(); }
 function clearAllDB() { if (!confirm('정말 모든 세대 데이터를 초기화하시겠습니까?')) return; dbData = []; save(); renderDBList(); }
 function autoGenDB() {
-  if (!confirm('648세대를 자동으로 생성하시겠습니까? (기존 데이터 유지)')) return;
-  const dongs = ['101', '102', '103', '104', '105', '106', '107', '108'];
-  dongs.forEach(d => { for (let f = 1; f <= 18; f++) { for (let l = 1; l <= 5; l++) { const ho = (f * 100 + l).toString(); if (!dbData.find(i => i.dong === d && i.ho === ho)) { dbData.push({ dong: d, ho: ho, name: '', member: '', phone: '', date: new Date().toISOString().split('T')[0] }); } } } });
+  const totalBuildings = cfg.buildings || 8;
+  const totalHouseholds = cfg.households || 648;
+  // 세대수 / 동수로 동당 세대수 계산 (층당 세대 구조 추정)
+  const unitsPerBuilding = Math.round(totalHouseholds / totalBuildings);
+  // 층당 세대 수(라인 수) 추정: 1~5라인이 일반적
+  const linesPerFloor = 5; // 기본 5라인 (01~05)
+  const floors = Math.round(unitsPerBuilding / linesPerFloor);
+  if (!confirm(`${totalBuildings}개동 × ${floors}층 × ${linesPerFloor}라인 = ${totalBuildings * floors * linesPerFloor}세대를 자동으로 생성하시겠습니까? (기존 데이터 유지)`)) return;
+  const today = new Date().toISOString().split('T')[0];
+  DONGS.forEach(d => {
+    for (let f = 1; f <= floors; f++) {
+      for (let l = 1; l <= linesPerFloor; l++) {
+        const ho = (f * 100 + l).toString();
+        if (!dbData.find(i => i.dong === d && i.ho === ho)) {
+          dbData.push({ dong: d, ho: ho, name: '', member: '', phone: '', date: today });
+        }
+      }
+    }
+  });
   save(); renderDBList();
 }
 function renderDBList() {
@@ -1333,8 +1363,31 @@ function loadSettings() {
 }
 function updateHeaderInfo(){document.getElementById('header-세대').textContent=`${cfg.buildings||8}개동 ${cfg.households||648}세대`;}
 function updateSettingsUI() { document.getElementById('settings-summary').innerHTML = `• 아파트 정보: ${cfg.buildings||8}개동 / ${cfg.households||648}세대<br>• 헬스장: 기본 ${cfg.gymFee.toLocaleString()}원 (${cfg.gymBase}명까지) / 추가 ${cfg.gymAdd.toLocaleString()}원<br>• 주차: 기본 ${cfg.parkFee.toLocaleString()}원 (${cfg.parkBase}대까지) / 추가 ${cfg.parkAdd.toLocaleString()}원<br>• 사물함: 개당 ${cfg.lockerFee.toLocaleString()}원<br>• 부과기준: 매월 ${cfg.cutDay}일 이후 등록 시 다음 달부터 부과`; }
-function saveSettings() { cfg.gymFee = parseInt(document.getElementById('s-gym-fee').value); cfg.gymBase = parseInt(document.getElementById('s-gym-base').value); cfg.gymAdd = parseInt(document.getElementById('s-gym-add').value); cfg.cutDay = parseInt(document.getElementById('s-cut-day').value); cfg.parkFee = parseInt(document.getElementById('s-park-fee').value); cfg.parkBase = parseInt(document.getElementById('s-park-base').value); cfg.parkAdd = parseInt(document.getElementById('s-park-add').value); cfg.lockerFee = parseInt(document.getElementById('s-locker-fee').value); cfg.bank = document.getElementById('s-bank').value; cfg.phone = document.getElementById('s-phone').value; cfg.buildings=parseInt(document.getElementById('s-buildings').value)||0; cfg.households=parseInt(document.getElementById('s-households').value)||0; save(); updateHeaderInfo(); updateSettingsUI(); alert('✅ 설정이 저장되었습니다.'); }
-function resetSettings() { if (!confirm('기본값으로 초기화하시겠습니까?')) return; cfg = { "gymFee": 10000, "gymAdd": 5000, "gymBase": 2, "parkFee": 30000, "parkAdd": 50000, "parkBase": 2, "lockerFee": 3000, "cutDay": 20, "bank": "농협 000-0000-0000-00", "phone": "054-000-0000", "buildings":8, "households":648 }; save(); loadSettings(); updateHeaderInfo(); }
+function saveSettings() {
+  cfg.gymFee = parseInt(document.getElementById('s-gym-fee').value);
+  cfg.gymBase = parseInt(document.getElementById('s-gym-base').value);
+  cfg.gymAdd = parseInt(document.getElementById('s-gym-add').value);
+  cfg.cutDay = parseInt(document.getElementById('s-cut-day').value);
+  cfg.parkFee = parseInt(document.getElementById('s-park-fee').value);
+  cfg.parkBase = parseInt(document.getElementById('s-park-base').value);
+  cfg.parkAdd = parseInt(document.getElementById('s-park-add').value);
+  cfg.lockerFee = parseInt(document.getElementById('s-locker-fee').value);
+  cfg.bank = document.getElementById('s-bank').value;
+  cfg.phone = document.getElementById('s-phone').value;
+  const newBuildings = parseInt(document.getElementById('s-buildings').value) || 8;
+  const oldBuildings = cfg.buildings || 8;
+  cfg.buildings = newBuildings;
+  cfg.households = parseInt(document.getElementById('s-households').value) || 0;
+  save();
+  // 동 수가 변경된 경우 DONGS 배열과 모든 동 드롭다운 갱신
+  if (newBuildings !== oldBuildings) {
+    rebuildDongs();
+  }
+  updateHeaderInfo();
+  updateSettingsUI();
+  alert('✅ 설정이 저장되었습니다.');
+}
+function resetSettings() { if (!confirm('기본값으로 초기화하시겠습니까?')) return; cfg = { "gymFee": 10000, "gymAdd": 5000, "gymBase": 2, "parkFee": 30000, "parkAdd": 50000, "parkBase": 2, "lockerFee": 3000, "cutDay": 20, "bank": "농협 000-0000-0000-00", "phone": "054-000-0000", "buildings":8, "households":648 }; save(); rebuildDongs(); loadSettings(); updateHeaderInfo(); }
 
 function exportBackup() { const blob = new Blob([JSON.stringify({ gym: gymData, park: parkData, locker: lockerData, db: dbData, cfg: cfg })], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `아파트관리_백업_${new Date().toISOString().slice(0, 10)}.json`; a.click(); }
 function importBackup(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { try { const d = JSON.parse(ev.target.result); gymData = d.gym || []; parkData = d.park || []; lockerData = d.locker || []; dbData = d.db || []; cfg = d.cfg || cfg; save(); alert('✅ 데이터 복구가 완료되었습니다.'); location.reload(); } catch(err) { alert('❌ 올바른 백업 파일이 아닙니다.'); } }; r.readAsText(f); }
@@ -1369,7 +1422,7 @@ function exportToExcel() {
 
 window.onload = () => {
   document.getElementById('header-date').textContent = new Date().toLocaleDateString();
-  ['g-dong', 'p-dong', 'l-dong', 'q-dong', 'b-dong', 'db-dong-input'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = '<option value="">선택</option>' + DONGS.map(d => `<option value="${d}">${d}동</option>`).join(''); });
+  rebuildDongs(); // 동 드롭다운 최초 초기화 (DOM 로드 후)
   const savedTheme = localStorage.getItem(KEYS.THEME) || 'light'; setTheme(savedTheme);
   showPage('dash');
 };
@@ -1393,7 +1446,6 @@ window.onload = () => {
     </div>
   </div>
 </div>
-// 우마우스금지
     <style>
   #donation-banner {
     display: none;
@@ -1409,7 +1461,7 @@ window.onload = () => {
   }
 </style>
 
-<div id="donation-banner">☕ 코드보기는 금지되어있습니다!</div>
+<div id="donation-banner">☕ 커피 한 잔 후원으로 개발자를 응원해주세요!</div>
 
 <script>
   document.addEventListener('contextmenu', function(event) {
@@ -1421,6 +1473,5 @@ window.onload = () => {
     }, 3000); // 3초 후 자동 숨김
   });
 </script>
-    
 </body>
 </html>
