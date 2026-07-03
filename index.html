@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APT시설 이용료 정산(업무용 ERP 솔루션)V44.BETA</title>
+<title>APT시설 이용료 정산(업무용 ERP 솔루션)V45.BETA</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* 고급스러운 디자인 및 다크모드 지원 CSS */
@@ -476,13 +476,39 @@ tbody tr:last-child td { border-bottom: none; }
   line-height: 1;
 }
 .coffee-modal-close:hover { color: var(--text); }
-</style>
+  /* 민원관리 전용 스타일 */
+  .civ-status-접수 { background: var(--blue-light); color: var(--blue); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; }
+  .civ-status-처리중 { background: var(--amber-light); color: var(--amber); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; }
+  .civ-status-완료 { background: var(--accent-light); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; }
+  .civ-status-보류 { background: var(--bg); color: var(--text2); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; }
+  .civ-prio-긴급 { color: var(--red); font-weight: 800; }
+  .civ-photo-btn { cursor: pointer; color: var(--blue); text-decoration: underline; font-size: 12px; }
+  /* 재고관리 전용 스타일 */
+  .inv-shortage { color: var(--red) !important; font-weight: 800; background: var(--red-light); }
+  .inv-badge-ok { background: var(--accent-light); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .inv-badge-short { background: var(--red-light); color: var(--red); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .stat-card.red::after { background: var(--red); }
+  /* AI 문서작성 전용 스타일 */
+  .ai-type-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  #ai-result:empty::before { content: '내용을 입력하고 작성을 눌러주세요.'; color: var(--text2); }
+
+  /* 업무일정관리 전용 스타일 */
+  .sched-today { background-color: var(--accent-light) !important; font-weight: bold; }
+  .sched-completed { text-decoration: line-through; color: var(--text2); opacity: 0.6; }
+  .d-day-badge { 
+    display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 800;
+    background: var(--blue-light); color: var(--blue);
+  }
+  .d-day-urgent { background: var(--red-light); color: var(--red); }
+  .d-day-today { background: var(--accent-light); color: var(--accent); }
+  .repeat-badge { font-size: 11px; color: var(--purple); background: var(--purple-light); padding: 2px 6px; border-radius: 4px; }
+	</style>
 </head>
 <body>
 
 <div class="header no-print">
   <div class="header-left">
-    <h1>🏢APT시설 이용료 정산(업무용 ERP 솔루션)V44.beta</h1>
+    <h1>🏢APT시설 이용료 정산(업무용 ERP 솔루션)V45.beta</h1>
     <p>환경설정에서 요금부과설정 수정이 가능합니다</p>
   </div>
   <div class="header-right">
@@ -513,6 +539,7 @@ tbody tr:last-child td { border-bottom: none; }
     <span class="sidebar-label">메인 메뉴</span>
     <ul class="sidebar-menu">
       <li><a onclick="showPage('dash')" id="nav-dash" class="active">📊 대시보드</a></li>
+      <li><a onclick="showPage('office')" id="nav-office">🏢 관리업무센터</a></li>
     </ul>
     <div class="sidebar-divider"></div>
     <span class="sidebar-label">부과 관리</span>
@@ -549,13 +576,371 @@ tbody tr:last-child td { border-bottom: none; }
 
   <div class="content-wrap">
   <div class="content">
+    <!-- 관리업무센터 -->
+    <div id="page-office" class="page">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🏢 관리업무센터</div></div>
+        <div id="office-schedule-app">
+          <!-- 일정 등록 폼 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border); margin-bottom:20px;">
+            <div class="card-header" style="border-bottom:none; margin-bottom:10px; padding-bottom:0;">
+              <div class="card-title" style="font-size:15px;">📅 새 일정 등록</div>
+            </div>
+            <div class="form-grid form-grid-4">
+              <div class="form-group">
+                <label>일정명</label>
+                <input type="text" id="sched-title" placeholder="업무 내용을 입력하세요">
+              </div>
+              <div class="form-group">
+                <label>날짜</label>
+                <input type="date" id="sched-date">
+              </div>
+              <div class="form-group">
+                <label>반복 설정</label>
+                <select id="sched-repeat">
+                  <option value="none">반복 없음</option>
+                  <option value="weekly">매주 반복</option>
+                  <option value="monthly">매월 반복</option>
+                </select>
+              </div>
+              <div class="form-group" style="align-self:flex-end">
+                <button class="btn btn-primary" onclick="saveSchedule()" id="sched-save-btn" style="width:100%">등록하기</button>
+              </div>
+            </div>
+            <input type="hidden" id="sched-edit-id">
+          </div>
+
+          <!-- 일정 목록 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border);">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="card-title" style="font-size:15px;">📋 일정 목록</div>
+              <div style="font-size:12px; color:var(--text2);" id="sched-count"></div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:50px; text-align:center;">완료</th>
+                    <th>일정명</th>
+                    <th style="width:120px;">날짜</th>
+                    <th style="width:100px;">D-Day</th>
+                    <th style="width:100px;">반복</th>
+                    <th style="width:120px; text-align:center;">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="sched-list-body">
+                  <!-- 데이터가 동적으로 삽입됨 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="office-arrears-app" style="margin-top:30px;">
+          <!-- 체납 등록 폼 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border); margin-bottom:20px;">
+            <div class="card-header" style="border-bottom:none; margin-bottom:10px; padding-bottom:0;">
+              <div class="card-title" style="font-size:15px;">🚩 체납 내역 등록</div>
+            </div>
+            <div class="form-grid form-grid-4">
+              <div class="form-group"><label>동</label><input type="text" id="arr-dong" placeholder="예: 101"></div>
+              <div class="form-group"><label>호</label><input type="text" id="arr-ho" placeholder="예: 101"></div>
+              <div class="form-group"><label>성명</label><input type="text" id="arr-name" placeholder="이름"></div>
+              <div class="form-group"><label>체납금</label><input type="number" id="arr-amount" placeholder="0"></div>
+              <div class="form-group"><label>체납개월</label><input type="number" id="arr-months" placeholder="0"></div>
+              <div class="form-group"><label>독촉일</label><input type="date" id="arr-date"></div>
+              <div class="form-group" style="grid-column: span 2;"><label>메모</label><input type="text" id="arr-memo" placeholder="참고사항 입력"></div>
+            </div>
+            <div style="margin-top:15px; display:flex; gap:10px;">
+              <button class="btn btn-primary" onclick="saveArrears()" id="arr-save-btn" style="flex:1">등록하기</button>
+              <button class="btn btn-outline" onclick="clearArrForm()" style="width:100px">초기화</button>
+            </div>
+            <input type="hidden" id="arr-edit-id">
+          </div>
+
+          <!-- 체납 목록 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border);">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="card-title" style="font-size:15px;">📋 체납 관리 목록</div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="arr-search" placeholder="동, 호, 성명 검색..." onkeyup="renderArrears()" style="padding:6px 12px; border:1px solid var(--border); border-radius:6px; font-size:12px; width:180px;">
+                <button class="btn btn-blue btn-sm" onclick="exportArrearsToExcel()">Excel 출력</button>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>동</th>
+                    <th>호</th>
+                    <th>성명</th>
+                    <th>체납금</th>
+                    <th>개월</th>
+                    <th>독촉일</th>
+                    <th>메모</th>
+                    <th style="width:120px; text-align:center;">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="arr-list-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="office-inspection-app" style="margin-top:30px;">
+          <!-- 시설점검 등록 폼 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border); margin-bottom:20px;">
+            <div class="card-header" style="border-bottom:none; margin-bottom:10px; padding-bottom:0;">
+              <div class="card-title" style="font-size:15px;">🛠️ 시설 점검 등록</div>
+            </div>
+            <div class="form-grid form-grid-4">
+              <div class="form-group"><label>시설명</label><input type="text" id="ins-name" placeholder="점검 시설명"></div>
+              <div class="form-group"><label>점검일</label><input type="date" id="ins-date"></div>
+              <div class="form-group"><label>담당자</label><input type="text" id="ins-worker" placeholder="담당자 성명"></div>
+              <div class="form-group">
+                <label>점검결과</label>
+                <select id="ins-result">
+                  <option value="양호">✅ 양호</option>
+                  <option value="주의">⚠️ 주의</option>
+                  <option value="수리필요">🛠️ 수리필요</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column: span 2;"><label>메모</label><input type="text" id="ins-memo" placeholder="상세 점검 내용"></div>
+              <div class="form-group" style="grid-column: span 2;"><label>사진(URL)</label><input type="text" id="ins-photo" placeholder="이미지 주소 또는 텍스트"></div>
+            </div>
+            <div style="margin-top:15px; display:flex; gap:10px;">
+              <button class="btn btn-primary" onclick="saveInspection()" id="ins-save-btn" style="flex:1">등록하기</button>
+              <button class="btn btn-outline" onclick="clearInsForm()" style="width:100px">초기화</button>
+            </div>
+            <input type="hidden" id="ins-edit-id">
+          </div>
+
+          <!-- 시설점검 목록 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border);">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="card-title" style="font-size:15px;">📋 시설 점검 목록</div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="ins-search" placeholder="시설명, 담당자 검색..." onkeyup="renderInspection()" style="padding:6px 12px; border:1px solid var(--border); border-radius:6px; font-size:12px; width:180px;">
+                <button class="btn btn-blue btn-sm" onclick="exportInspectionToExcel()">Excel 출력</button>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:50px; text-align:center;">완료</th>
+                    <th>시설명</th>
+                    <th>점검일</th>
+                    <th>담당자</th>
+                    <th>결과</th>
+                    <th>메모</th>
+                    <th>사진</th>
+                    <th style="width:120px; text-align:center;">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="ins-list-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="office-civil-app" style="margin-top:30px;">
+          <!-- 민원 등록 폼 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border); margin-bottom:20px;">
+            <div class="card-header" style="border-bottom:none; margin-bottom:10px; padding-bottom:0;">
+              <div class="card-title" style="font-size:15px;">📢 민원(불편사항) 접수 및 등록</div>
+            </div>
+            <div class="form-grid form-grid-4">
+              <div class="form-group"><label>민원유형</label>
+                <select id="civ-type">
+                  <option value="시설">시설</option>
+                  <option value="주차">주차</option>
+                  <option value="소음">소음</option>
+                  <option value="청소">청소</option>
+                  <option value="보안">보안</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+              <div class="form-group"><label>우선순위</label>
+                <select id="civ-priority">
+                  <option value="보통">보통</option>
+                  <option value="긴급">🚨 긴급</option>
+                  <option value="낮음">낮음</option>
+                </select>
+              </div>
+              <div class="form-group"><label>성명/세대</label><input type="text" id="civ-requester" placeholder="홍길동(101-101)"></div>
+              <div class="form-group"><label>연락처</label><input type="text" id="civ-contact" placeholder="010-0000-0000"></div>
+              <div class="form-group" style="grid-column: span 2;"><label>민원내용</label><input type="text" id="civ-title" placeholder="민원 요약 및 내용"></div>
+              <div class="form-group"><label>담당자</label><input type="text" id="civ-worker" placeholder="처리 담당자"></div>
+              <div class="form-group"><label>처리상태</label>
+                <select id="civ-status">
+                  <option value="접수">접수</option>
+                  <option value="처리중">처리중</option>
+                  <option value="완료">완료</option>
+                  <option value="보류">보류</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column: span 2;"><label>메모/조치내용</label><input type="text" id="civ-memo" placeholder="상세 조치 결과"></div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>사진 첨부</label>
+                <div style="display:flex; gap:10px; align-items:center;">
+                  <input type="file" id="civ-file" accept="image/*" style="font-size:12px; flex:1;">
+                  <div id="civ-preview-container" style="display:none;"><img id="civ-preview" style="height:30px; border-radius:4px; border:1px solid var(--border);"></div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:15px; display:flex; gap:10px;">
+              <button class="btn btn-primary" onclick="saveCivil()" id="civ-save-btn" style="flex:1">민원 등록/수정</button>
+              <button class="btn btn-outline" onclick="clearCivForm()" style="width:100px">초기화</button>
+            </div>
+            <input type="hidden" id="civ-edit-id">
+            <input type="hidden" id="civ-photo-base64">
+          </div>
+
+          <!-- 민원 목록 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border);">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="card-title" style="font-size:15px;">📋 민원 관리 목록</div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="civ-search" placeholder="성명, 내용, 담당자 검색..." onkeyup="renderCivil()" style="padding:6px 12px; border:1px solid var(--border); border-radius:6px; font-size:12px; width:200px;">
+                <button class="btn btn-blue btn-sm" onclick="exportCivilToExcel()">Excel 다운로드</button>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>상태</th>
+                    <th>유형</th>
+                    <th>우선순위</th>
+                    <th>민원내용</th>
+                    <th>요청자</th>
+                    <th>등록일</th>
+                    <th>완료일</th>
+                    <th>담당자</th>
+                    <th style="width:120px; text-align:center;">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="civ-list-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="office-inventory-app" style="margin-top:30px;">
+          <!-- 재고 등록 폼 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border); margin-bottom:20px;">
+            <div class="card-header" style="border-bottom:none; margin-bottom:10px; padding-bottom:0;">
+              <div class="card-title" style="font-size:15px;">📦 소모품 및 자산 재고 등록</div>
+            </div>
+            <div class="form-grid form-grid-4">
+              <div class="form-group"><label>품목명</label><input type="text" id="inv-name" placeholder="품목명 입력"></div>
+              <div class="form-group"><label>분류</label><input type="text" id="inv-cat" placeholder="예: 소모품, 비품"></div>
+              <div class="form-group"><label>규격</label><input type="text" id="inv-spec" placeholder="예: A4, 10L"></div>
+              <div class="form-group"><label>보관위치</label><input type="text" id="inv-loc" placeholder="예: 관리소 창고"></div>
+              <div class="form-group"><label>현재재고</label><input type="number" id="inv-stock" value="0"></div>
+              <div class="form-group"><label>최소재고</label><input type="number" id="inv-min" value="5"></div>
+              <div class="form-group"><label>구매업체</label><input type="text" id="inv-vendor" placeholder="구매처"></div>
+              <div class="form-group"><label>담당자</label><input type="text" id="inv-worker" placeholder="담당자"></div>
+              <div class="form-group" style="grid-column: span 2;"><label>메모</label><input type="text" id="inv-memo" placeholder="기타 참고사항"></div>
+              <div class="form-group" style="align-self:flex-end">
+                <button class="btn btn-primary" onclick="saveInventory()" id="inv-save-btn" style="width:100%">품목 등록/수정</button>
+              </div>
+            </div>
+            <input type="hidden" id="inv-edit-id">
+          </div>
+
+          <!-- 재고 목록 -->
+          <div class="card" style="box-shadow:none; border:1px solid var(--border);">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="card-title" style="font-size:15px;">📋 재고 관리 현황</div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="inv-search" placeholder="품목명, 분류 검색..." onkeyup="renderInventory()" style="padding:6px 12px; border:1px solid var(--border); border-radius:6px; font-size:12px; width:180px;">
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('inv-upload').click()">Excel 업로드</button>
+                <input type="file" id="inv-upload" style="display:none" accept=".xlsx, .xls" onchange="importInventoryFromExcel(event)">
+                <button class="btn btn-blue btn-sm" onclick="exportInventoryToExcel()">Excel 다운로드</button>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>분류</th>
+                    <th>품목명(규격)</th>
+                    <th>보관위치</th>
+                    <th style="text-align:right;">현재재고</th>
+                    <th style="text-align:right;">최소재고</th>
+                    <th>상태</th>
+                    <th>입/출고</th>
+                    <th style="width:120px; text-align:center;">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="inv-list-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="office-ai-app" style="margin-top:30px;">
+          <div class="card" style="box-shadow:none; border:1px solid var(--border);">
+            <div class="card-header" style="border-bottom:none; margin-bottom:10px; padding-bottom:0;">
+              <div class="card-title" style="font-size:15px;">🤖 AI 스마트 문서 작성 도우미</div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 200px 1fr 1fr; gap:20px; min-height:400px; padding:15px;">
+              <!-- 좌측: 문서종류 선택 -->
+              <div style="border-right:1px solid var(--border); padding-right:15px;">
+                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:10px; color:var(--text2);">1. 문서 종류 선택</label>
+                <div id="ai-doc-types" style="display:flex; flex-direction:column; gap:5px;">
+                  <button class="btn btn-outline btn-sm ai-type-btn active" onclick="setAiDocType('공지문', this)">📢 공지문</button>
+                  <button class="btn btn-outline btn-sm ai-type-btn" onclick="setAiDocType('안내문', this)">ℹ️ 안내문</button>
+                  <button class="btn btn-outline btn-sm ai-type-btn" onclick="setAiDocType('민원답변', this)">💬 민원답변</button>
+                  <button class="btn btn-outline btn-sm ai-type-btn" onclick="setAiDocType('체납독촉장', this)">🚩 체납독촉장</button>
+                  <button class="btn btn-outline btn-sm ai-type-btn" onclick="setAiDocType('작업지시서', this)">🛠️ 작업지시서</button>
+                  <button class="btn btn-outline btn-sm ai-type-btn" onclick="setAiDocType('회의록', this)">📝 회의록</button>
+                  <button class="btn btn-outline btn-sm ai-type-btn" onclick="setAiDocType('시설점검결과', this)">🔍 시설점검결과</button>
+                  <button class="btn btn-outline btn-sm ai-type-btn" onclick="setAiDocType('안전교육자료', this)">👷 안전교육자료</button>
+                  <button class="btn btn-outline btn-sm ai-type-btn" onclick="setAiDocType('입주민 안내문', this)">🏠 입주민 안내문</button>
+                  <button class="btn btn-outline btn-sm ai-type-btn" onclick="setAiDocType('공문', this)">📄 공문</button>
+                </div>
+              </div>
+
+              <!-- 가운데: 입력창 -->
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <label style="display:block; font-size:12px; font-weight:700; color:var(--text2);">2. 핵심 키워드/내용 입력</label>
+                <textarea id="ai-input" style="flex:1; width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; font-size:13px; resize:none; line-height:1.6;" placeholder="예) 승강기 정기점검&#10;7월15일 오전10시&#10;운행중단 2시간&#10;안전점검 실시"></textarea>
+                <button class="btn btn-primary" onclick="generateAiDoc()" style="width:100%; height:45px; font-weight:700;">✨ AI 문서 작성 시작</button>
+              </div>
+
+              <!-- 우측: 결과창 -->
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <label style="display:block; font-size:12px; font-weight:700; color:var(--text2);">3. AI 작성 결과</label>
+                  <div style="display:flex; gap:5px;">
+                    <button class="btn btn-outline btn-sm" onclick="copyAiResult()" style="padding:2px 8px;">복사</button>
+                    <button class="btn btn-outline btn-sm" onclick="printAiResult()" style="padding:2px 8px;">인쇄</button>
+                  </div>
+                </div>
+                <div id="ai-result" style="flex:1; width:100%; padding:15px; border:1px solid var(--border); border-radius:8px; font-size:13px; background:var(--bg); white-space:pre-wrap; line-height:1.8; overflow-y:auto; border:2px dashed var(--accent-light);">작성된 문서가 여기에 표시됩니다.</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
+                  <button class="btn btn-blue btn-sm" onclick="saveAiAsPdf()">PDF 저장</button>
+                  <button class="btn btn-outline btn-sm" onclick="saveAiAsTxt()">TXT 저장</button>
+                  <button class="btn btn-red btn-sm" onclick="clearAiApp()">초기화</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 대시보드 -->
     <div id="page-dash" class="page active">
       <div id="dash-stat-grid" class="stat-grid"></div>
       <div class="card">
-        <div class="card-header"><div class="card-title">✨ v44 업데이트 안내</div></div>
+        <div class="card-header"><div class="card-title">✨ v45 업데이트 안내</div></div>
         <div style="line-height:1.8">
-          <p>• <b>버그 수정 (v44):</b> 아래 항목들이 수정되었습니다.</p>
+          <p>• <b>버그 수정 (V45):</b> 아래 항목들이 수정되었습니다.</p>
           <p>• <b>동 드롭다운 동기화:</b> 환경설정에서 동 수 변경 시 모든 동 선택 드롭다운이 즉시 갱신됩니다.</p>
           <p>• <b>전체 세대 자동생성:</b> 648세대 고정이 아닌 환경설정의 <b>동 수 / 세대 수</b>를 기반으로 동적 생성됩니다.</p>
           <p>• <b>호수 정렬 오류 수정:</b> 조회/고지서 출력에서 호수가 문자순(201 &lt; 99) 대신 숫자순(99 &lt; 201)으로 올바르게 정렬됩니다.</p>
@@ -563,6 +948,7 @@ tbody tr:last-child td { border-bottom: none; }
           <p>• <b>해지 관리 페이지 스타일 수정:</b> 헬스장/주차/사물함 해지 관리 페이지 헤더가 정상 표시됩니다.</p>
           <p>• <b>세대 DB 드롭다운 누락 수정:</b> 초기 로드 시 세대 DB 필터 드롭다운도 올바르게 초기화됩니다.</p>
           <p>• <b>데이터삭제주의:</b> PC를 교체하거나 브라우저 초기화시 '데이터 내보내기(JSON)', '데이터 가져오기', '엑셀 파일 다운로드' 기능을 꼭 사용하십시오.</p>
+          <p>• <b>관리업무센터:</b>자동 AI문서기능 및 전반적인 아파트 관리메뉴를 추가했습니다.</p>
         </div>
       </div>
     </div>
@@ -872,6 +1258,7 @@ function showPage(name) {
   if (name === 'parkcancel') renderCancelList('park');
   if (name === 'lockercancel') renderCancelList('locker');
   if (name === 'db') renderDB();
+  if (name === 'office') { renderSchedule(); renderArrears(); renderInspection(); renderCivil(); renderInventory(); initAiDoc(); }
 }
 
 function openSettingsAuth() {
@@ -1472,6 +1859,876 @@ window.onload = () => {
       banner.style.display = 'none';
     }, 3000); // 3초 후 자동 숨김
   });
-</script>
-</body>
+
+// --- 업무일정관리 (Add Only) ---
+const SCHED_KEY = 'office_schedule';
+
+function getSchedules() {
+  return JSON.parse(localStorage.getItem(SCHED_KEY) || '[]');
+}
+
+function saveSchedule() {
+  const title = document.getElementById('sched-title').value.trim();
+  const date = document.getElementById('sched-date').value;
+  const repeat = document.getElementById('sched-repeat').value;
+  const editId = document.getElementById('sched-edit-id').value;
+
+  if (!title || !date) { alert('일정명과 날짜를 입력해주세요.'); return; }
+
+  let schedules = getSchedules();
+  if (editId) {
+    const idx = schedules.findIndex(s => s.id == editId);
+    if (idx > -1) {
+      schedules[idx] = { ...schedules[idx], title, date, repeat };
+    }
+  } else {
+    schedules.push({
+      id: Date.now(),
+      title,
+      date,
+      repeat,
+      completed: false
+    });
+  }
+
+  localStorage.setItem(SCHED_KEY, JSON.stringify(schedules));
+  clearSchedForm();
+  renderSchedule();
+}
+
+function clearSchedForm() {
+  document.getElementById('sched-title').value = '';
+  document.getElementById('sched-date').value = '';
+  document.getElementById('sched-repeat').value = 'none';
+  document.getElementById('sched-edit-id').value = '';
+  document.getElementById('sched-save-btn').textContent = '등록하기';
+}
+
+function toggleSchedComplete(id) {
+  let schedules = getSchedules();
+  const idx = schedules.findIndex(s => s.id == id);
+  if (idx > -1) {
+    schedules[idx].completed = !schedules[idx].completed;
+    localStorage.setItem(SCHED_KEY, JSON.stringify(schedules));
+    renderSchedule();
+  }
+}
+
+function deleteSchedule(id) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  let schedules = getSchedules();
+  schedules = schedules.filter(s => s.id != id);
+  localStorage.setItem(SCHED_KEY, JSON.stringify(schedules));
+  renderSchedule();
+}
+
+function editSchedule(id) {
+  const schedules = getSchedules();
+  const item = schedules.find(s => s.id == id);
+  if (item) {
+    document.getElementById('sched-title').value = item.title;
+    document.getElementById('sched-date').value = item.date;
+    document.getElementById('sched-repeat').value = item.repeat;
+    document.getElementById('sched-edit-id').value = item.id;
+    document.getElementById('sched-save-btn').textContent = '수정하기';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function renderSchedule() {
+  const tbody = document.getElementById('sched-list-body');
+  if (!tbody) return;
+  
+  let schedules = getSchedules();
+  const todayStr = new Date().toISOString().split('T')[0];
+  
+  // 정렬: 미완료 우선, 날짜순
+  schedules.sort((a, b) => {
+    if (a.completed !== b.completed) return a.completed ? 1 : -1;
+    return a.date.localeCompare(b.date);
+  });
+
+  tbody.innerHTML = schedules.length ? '' : '<tr><td colspan="6" class="tbl-empty">등록된 일정이 없습니다.</td></tr>';
+  
+  schedules.forEach(s => {
+    const isToday = s.date === todayStr;
+    const dDay = calculateDDay(s.date);
+    const dDayClass = dDay === 0 ? 'd-day-today' : (dDay > 0 && dDay <= 3 ? 'd-day-urgent' : '');
+    const dDayText = dDay === 0 ? 'D-Day' : (dDay > 0 ? `D-${dDay}` : `D+${Math.abs(dDay)}`);
+    const repeatText = s.repeat === 'weekly' ? '매주' : (s.repeat === 'monthly' ? '매월' : '-');
+
+    const tr = document.createElement('tr');
+    if (isToday && !s.completed) tr.className = 'sched-today';
+    
+    tr.innerHTML = `
+      <td style="text-align:center;"><input type="checkbox" ${s.completed ? 'checked' : ''} onclick="toggleSchedComplete(${s.id})"></td>
+      <td class="${s.completed ? 'sched-completed' : ''}">${s.title}</td>
+      <td>${s.date}</td>
+      <td><span class="d-day-badge ${dDayClass}">${dDayText}</span></td>
+      <td>${s.repeat !== 'none' ? `<span class="repeat-badge">${repeatText}</span>` : '-'}</td>
+      <td style="text-align:center;">
+        <button class="btn btn-outline btn-sm" onclick="editSchedule(${s.id})">수정</button>
+        <button class="btn btn-red btn-sm" onclick="deleteSchedule(${s.id})">삭제</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  
+  document.getElementById('sched-count').textContent = `총 ${schedules.length}건`;
+}
+
+function calculateDDay(targetDate) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(targetDate);
+  target.setHours(0, 0, 0, 0);
+  const diffTime = target - today;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+// --- 업무일정관리 끝 ---
+
+// --- 체납관리 (Add Only) ---
+const ARR_KEY = 'office_arrears';
+
+function getArrears() {
+  return JSON.parse(localStorage.getItem(ARR_KEY) || '[]');
+}
+
+function saveArrears() {
+  const dong = document.getElementById('arr-dong').value.trim();
+  const ho = document.getElementById('arr-ho').value.trim();
+  const name = document.getElementById('arr-name').value.trim();
+  const amount = document.getElementById('arr-amount').value;
+  const months = document.getElementById('arr-months').value;
+  const date = document.getElementById('arr-date').value;
+  const memo = document.getElementById('arr-memo').value.trim();
+  const editId = document.getElementById('arr-edit-id').value;
+
+  if (!dong || !ho || !name) { alert('동, 호, 성명은 필수 입력 항목입니다.'); return; }
+
+  let arrears = getArrears();
+  if (editId) {
+    const idx = arrears.findIndex(a => a.id == editId);
+    if (idx > -1) {
+      arrears[idx] = { ...arrears[idx], dong, ho, name, amount, months, date, memo };
+    }
+  } else {
+    arrears.push({
+      id: Date.now(),
+      dong, ho, name, amount, months, date, memo
+    });
+  }
+
+  localStorage.setItem(ARR_KEY, JSON.stringify(arrears));
+  clearArrForm();
+  renderArrears();
+}
+
+function clearArrForm() {
+  document.getElementById('arr-dong').value = '';
+  document.getElementById('arr-ho').value = '';
+  document.getElementById('arr-name').value = '';
+  document.getElementById('arr-amount').value = '';
+  document.getElementById('arr-months').value = '';
+  document.getElementById('arr-date').value = '';
+  document.getElementById('arr-memo').value = '';
+  document.getElementById('arr-edit-id').value = '';
+  document.getElementById('arr-save-btn').textContent = '등록하기';
+}
+
+function deleteArrears(id) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  let arrears = getArrears().filter(a => a.id != id);
+  localStorage.setItem(ARR_KEY, JSON.stringify(arrears));
+  renderArrears();
+}
+
+function editArrears(id) {
+  const item = getArrears().find(a => a.id == id);
+  if (item) {
+    document.getElementById('arr-dong').value = item.dong;
+    document.getElementById('arr-ho').value = item.ho;
+    document.getElementById('arr-name').value = item.name;
+    document.getElementById('arr-amount').value = item.amount;
+    document.getElementById('arr-months').value = item.months;
+    document.getElementById('arr-date').value = item.date;
+    document.getElementById('arr-memo').value = item.memo;
+    document.getElementById('arr-edit-id').value = item.id;
+    document.getElementById('arr-save-btn').textContent = '수정하기';
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  }
+}
+
+function renderArrears() {
+  const tbody = document.getElementById('arr-list-body');
+  if (!tbody) return;
+  
+  const search = document.getElementById('arr-search').value.toLowerCase();
+  let arrears = getArrears();
+  
+  if (search) {
+    arrears = arrears.filter(a => 
+      a.dong.includes(search) || a.ho.includes(search) || a.name.toLowerCase().includes(search)
+    );
+  }
+
+  // 정렬: 동, 호수 순
+  arrears.sort((a, b) => a.dong === b.dong ? (parseInt(a.ho) || 0) - (parseInt(b.ho) || 0) : a.dong.localeCompare(b.dong));
+
+  tbody.innerHTML = arrears.length ? '' : '<tr><td colspan="8" class="tbl-empty">등록된 체납 내역이 없습니다.</td></tr>';
+  
+  arrears.forEach(a => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${a.dong}</td>
+      <td>${a.ho}</td>
+      <td>${a.name}</td>
+      <td>${parseInt(a.amount || 0).toLocaleString()}원</td>
+      <td>${a.months || 0}개월</td>
+      <td>${a.date || '-'}</td>
+      <td style="font-size:12px; color:var(--text2);">${a.memo || '-'}</td>
+      <td style="text-align:center;">
+        <button class="btn btn-outline btn-sm" onclick="editArrears(${a.id})">수정</button>
+        <button class="btn btn-red btn-sm" onclick="deleteArrears(${a.id})">삭제</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function exportArrearsToExcel() {
+  const arrears = getArrears();
+  if (!arrears.length) { alert('내보낼 데이터가 없습니다.'); return; }
+  
+  const rows = arrears.map(a => ({
+    '동': a.dong,
+    '호': a.ho,
+    '성명': a.name,
+    '체납금': parseInt(a.amount || 0),
+    '체납개월': parseInt(a.months || 0),
+    '독촉일': a.date,
+    '메모': a.memo
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "체납관리");
+  XLSX.writeFile(wb, `체납관리명단_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+// --- 체납관리 끝 ---
+
+// --- 시설점검 (Add Only) ---
+const INS_KEY = 'office_inspection';
+
+function getInspections() {
+  return JSON.parse(localStorage.getItem(INS_KEY) || '[]');
+}
+
+function saveInspection() {
+  const name = document.getElementById('ins-name').value.trim();
+  const date = document.getElementById('ins-date').value;
+  const worker = document.getElementById('ins-worker').value.trim();
+  const result = document.getElementById('ins-result').value;
+  const memo = document.getElementById('ins-memo').value.trim();
+  const photo = document.getElementById('ins-photo').value.trim();
+  const editId = document.getElementById('ins-edit-id').value;
+
+  if (!name || !date) { alert('시설명과 점검일은 필수 입력 항목입니다.'); return; }
+
+  let inspections = getInspections();
+  if (editId) {
+    const idx = inspections.findIndex(i => i.id == editId);
+    if (idx > -1) {
+      inspections[idx] = { ...inspections[idx], name, date, worker, result, memo, photo };
+    }
+  } else {
+    inspections.push({
+      id: Date.now(),
+      name, date, worker, result, memo, photo,
+      completed: false
+    });
+  }
+
+  localStorage.setItem(INS_KEY, JSON.stringify(inspections));
+  clearInsForm();
+  renderInspection();
+}
+
+function clearInsForm() {
+  document.getElementById('ins-name').value = '';
+  document.getElementById('ins-date').value = '';
+  document.getElementById('ins-worker').value = '';
+  document.getElementById('ins-result').value = '양호';
+  document.getElementById('ins-memo').value = '';
+  document.getElementById('ins-photo').value = '';
+  document.getElementById('ins-edit-id').value = '';
+  document.getElementById('ins-save-btn').textContent = '등록하기';
+}
+
+function toggleInsComplete(id) {
+  let inspections = getInspections();
+  const idx = inspections.findIndex(i => i.id == id);
+  if (idx > -1) {
+    inspections[idx].completed = !inspections[idx].completed;
+    localStorage.setItem(INS_KEY, JSON.stringify(inspections));
+    renderInspection();
+  }
+}
+
+function deleteInspection(id) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  let inspections = getInspections().filter(i => i.id != id);
+  localStorage.setItem(INS_KEY, JSON.stringify(inspections));
+  renderInspection();
+}
+
+function editInspection(id) {
+  const item = getInspections().find(i => i.id == id);
+  if (item) {
+    document.getElementById('ins-name').value = item.name;
+    document.getElementById('ins-date').value = item.date;
+    document.getElementById('ins-worker').value = item.worker;
+    document.getElementById('ins-result').value = item.result;
+    document.getElementById('ins-memo').value = item.memo;
+    document.getElementById('ins-photo').value = item.photo;
+    document.getElementById('ins-edit-id').value = item.id;
+    document.getElementById('ins-save-btn').textContent = '수정하기';
+    window.scrollTo({ top: 800, behavior: 'smooth' });
+  }
+}
+
+function renderInspection() {
+  const tbody = document.getElementById('ins-list-body');
+  if (!tbody) return;
+  
+  const search = document.getElementById('ins-search').value.toLowerCase();
+  let inspections = getInspections();
+  
+  if (search) {
+    inspections = inspections.filter(i => 
+      i.name.toLowerCase().includes(search) || i.worker.toLowerCase().includes(search)
+    );
+  }
+
+  inspections.sort((a, b) => b.date.localeCompare(a.date));
+
+  tbody.innerHTML = inspections.length ? '' : '<tr><td colspan="8" class="tbl-empty">등록된 점검 내역이 없습니다.</td></tr>';
+  
+  inspections.forEach(i => {
+    const tr = document.createElement('tr');
+    const resultColor = i.result === '양호' ? 'var(--accent)' : (i.result === '주의' ? 'var(--amber)' : 'var(--red)');
+    
+    tr.innerHTML = `
+      <td style="text-align:center;"><input type="checkbox" ${i.completed ? 'checked' : ''} onclick="toggleInsComplete(${i.id})"></td>
+      <td class="${i.completed ? 'sched-completed' : ''}">${i.name}</td>
+      <td>${i.date}</td>
+      <td>${i.worker || '-'}</td>
+      <td style="color:${resultColor}; font-weight:700;">${i.result}</td>
+      <td style="font-size:12px; color:var(--text2);">${i.memo || '-'}</td>
+      <td>${i.photo ? (i.photo.startsWith('http') ? `<a href="${i.photo}" target="_blank">🔗보기</a>` : i.photo) : '-'}</td>
+      <td style="text-align:center;">
+        <button class="btn btn-outline btn-sm" onclick="editInspection(${i.id})">수정</button>
+        <button class="btn btn-red btn-sm" onclick="deleteInspection(${i.id})">삭제</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function exportInspectionToExcel() {
+  const inspections = getInspections();
+  if (!inspections.length) { alert('내보낼 데이터가 없습니다.'); return; }
+  
+  const rows = inspections.map(i => ({
+    '시설명': i.name,
+    '점검일': i.date,
+    '담당자': i.worker,
+    '점검결과': i.result,
+    '메모': i.memo,
+    '사진': i.photo,
+    '완료여부': i.completed ? '완료' : '미완료'
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "시설점검");
+  XLSX.writeFile(wb, `시설점검목록_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+// --- 시설점검 끝 ---
+
+// --- 민원관리 (Add Only) ---
+const CIV_KEY = 'office_civil';
+
+// 사진 첨부 시 Base64 변환 처리
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.id === 'civ-file') {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        document.getElementById('civ-photo-base64').value = event.target.result;
+        document.getElementById('civ-preview').src = event.target.result;
+        document.getElementById('civ-preview-container').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+});
+
+function getCivils() {
+  return JSON.parse(localStorage.getItem(CIV_KEY) || '[]');
+}
+
+function saveCivil() {
+  const type = document.getElementById('civ-type').value;
+  const priority = document.getElementById('civ-priority').value;
+  const requester = document.getElementById('civ-requester').value.trim();
+  const contact = document.getElementById('civ-contact').value.trim();
+  const title = document.getElementById('civ-title').value.trim();
+  const worker = document.getElementById('civ-worker').value.trim();
+  const status = document.getElementById('civ-status').value;
+  const memo = document.getElementById('civ-memo').value.trim();
+  const photo = document.getElementById('civ-photo-base64').value;
+  const editId = document.getElementById('civ-edit-id').value;
+
+  if (!requester || !title) { alert('요청자(세대)와 민원내용은 필수입니다.'); return; }
+
+  let civils = getCivils();
+  const now = new Date().toISOString().split('T')[0];
+
+  if (editId) {
+    const idx = civils.findIndex(c => c.id == editId);
+    if (idx > -1) {
+      const oldStatus = civils[idx].status;
+      civils[idx] = { 
+        ...civils[idx], type, priority, requester, contact, title, worker, status, memo, photo,
+        finishDate: (status === '완료' && oldStatus !== '완료') ? now : (status === '완료' ? civils[idx].finishDate : '')
+      };
+    }
+  } else {
+    civils.push({
+      id: Date.now(),
+      type, priority, requester, contact, title, worker, status, memo, photo,
+      regDate: now,
+      finishDate: status === '완료' ? now : ''
+    });
+  }
+
+  localStorage.setItem(CIV_KEY, JSON.stringify(civils));
+  clearCivForm();
+  renderCivil();
+}
+
+function clearCivForm() {
+  document.getElementById('civ-type').value = '시설';
+  document.getElementById('civ-priority').value = '보통';
+  document.getElementById('civ-requester').value = '';
+  document.getElementById('civ-contact').value = '';
+  document.getElementById('civ-title').value = '';
+  document.getElementById('civ-worker').value = '';
+  document.getElementById('civ-status').value = '접수';
+  document.getElementById('civ-memo').value = '';
+  document.getElementById('civ-file').value = '';
+  document.getElementById('civ-photo-base64').value = '';
+  document.getElementById('civ-preview-container').style.display = 'none';
+  document.getElementById('civ-edit-id').value = '';
+  document.getElementById('civ-save-btn').textContent = '민원 등록/수정';
+}
+
+function deleteCivil(id) {
+  if (!confirm('민원 내역을 삭제하시겠습니까?')) return;
+  let civils = getCivils().filter(c => c.id != id);
+  localStorage.setItem(CIV_KEY, JSON.stringify(civils));
+  renderCivil();
+}
+
+function editCivil(id) {
+  const item = getCivils().find(c => c.id == id);
+  if (item) {
+    document.getElementById('civ-type').value = item.type;
+    document.getElementById('civ-priority').value = item.priority;
+    document.getElementById('civ-requester').value = item.requester;
+    document.getElementById('civ-contact').value = item.contact || '';
+    document.getElementById('civ-title').value = item.title;
+    document.getElementById('civ-worker').value = item.worker || '';
+    document.getElementById('civ-status').value = item.status;
+    document.getElementById('civ-memo').value = item.memo || '';
+    document.getElementById('civ-photo-base64').value = item.photo || '';
+    if (item.photo) {
+      document.getElementById('civ-preview').src = item.photo;
+      document.getElementById('civ-preview-container').style.display = 'block';
+    } else {
+      document.getElementById('civ-preview-container').style.display = 'none';
+    }
+    document.getElementById('civ-edit-id').value = item.id;
+    document.getElementById('civ-save-btn').textContent = '수정 내용 저장';
+    window.scrollTo({ top: 1200, behavior: 'smooth' });
+  }
+}
+
+function renderCivil() {
+  const tbody = document.getElementById('civ-list-body');
+  if (!tbody) return;
+  
+  const search = document.getElementById('civ-search').value.toLowerCase();
+  let civils = getCivils();
+  
+  if (search) {
+    civils = civils.filter(c => 
+      c.requester.toLowerCase().includes(search) || 
+      c.title.toLowerCase().includes(search) || 
+      (c.worker && c.worker.toLowerCase().includes(search))
+    );
+  }
+
+  // 최신순 정렬
+  civils.sort((a, b) => b.id - a.id);
+
+  tbody.innerHTML = civils.length ? '' : '<tr><td colspan="9" class="tbl-empty">접수된 민원 내역이 없습니다.</td></tr>';
+  
+  civils.forEach(c => {
+    const tr = document.createElement('tr');
+    const prioClass = c.priority === '긴급' ? 'civ-prio-긴급' : '';
+    
+    tr.innerHTML = `
+      <td><span class="civ-status-${c.status}">${c.status}</span></td>
+      <td>${c.type}</td>
+      <td class="${prioClass}">${c.priority}</td>
+      <td>
+        <div style="font-weight:700;">${c.title}</div>
+        <div style="font-size:11px; color:var(--text2);">${c.memo || ''}</div>
+        ${c.photo ? `<span class="civ-photo-btn" onclick="viewCivPhoto('${c.id}')">🖼️ 사진보기</span>` : ''}
+      </td>
+      <td>${c.requester}<br><span style="font-size:11px; color:var(--text2);">${c.contact || ''}</span></td>
+      <td>${c.regDate}</td>
+      <td>${c.finishDate || '-'}</td>
+      <td>${c.worker || '-'}</td>
+      <td style="text-align:center;">
+        <button class="btn btn-outline btn-sm" onclick="editCivil(${c.id})">수정</button>
+        <button class="btn btn-red btn-sm" onclick="deleteCivil(${c.id})">삭제</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function viewCivPhoto(id) {
+  const item = getCivils().find(c => c.id == id);
+  if (item && item.photo) {
+    const win = window.open("");
+    win.document.write(`<img src="${item.photo}" style="max-width:100%;">`);
+  }
+}
+
+function exportCivilToExcel() {
+  const civils = getCivils();
+  if (!civils.length) { alert('데이터가 없습니다.'); return; }
+  
+  const rows = civils.map(c => ({
+    '상태': c.status,
+    '유형': c.type,
+    '우선순위': c.priority,
+    '민원내용': c.title,
+    '요청자': c.requester,
+    '연락처': c.contact,
+    '등록일': c.regDate,
+    '완료일': c.finishDate,
+    '담당자': c.worker,
+    '메모': c.memo
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "민원관리");
+  XLSX.writeFile(wb, `민원관리목록_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+// --- 민원관리 끝 ---
+
+// --- 재고관리 (Add Only) ---
+const INV_KEY = 'office_inventory';
+
+function getInventory() {
+  return JSON.parse(localStorage.getItem(INV_KEY) || '[]');
+}
+
+function saveInventory() {
+  const name = document.getElementById('inv-name').value.trim();
+  const cat = document.getElementById('inv-cat').value.trim();
+  const spec = document.getElementById('inv-spec').value.trim();
+  const loc = document.getElementById('inv-loc').value.trim();
+  const stock = parseInt(document.getElementById('inv-stock').value || 0);
+  const min = parseInt(document.getElementById('inv-min').value || 0);
+  const vendor = document.getElementById('inv-vendor').value.trim();
+  const worker = document.getElementById('inv-worker').value.trim();
+  const memo = document.getElementById('inv-memo').value.trim();
+  const editId = document.getElementById('inv-edit-id').value;
+
+  if (!name) { alert('품목명은 필수입니다.'); return; }
+
+  let inventory = getInventory();
+  if (editId) {
+    const idx = inventory.findIndex(i => i.id == editId);
+    if (idx > -1) {
+      inventory[idx] = { ...inventory[idx], name, cat, spec, loc, stock, min, vendor, worker, memo };
+    }
+  } else {
+    inventory.push({ id: Date.now(), name, cat, spec, loc, stock, min, vendor, worker, memo });
+  }
+
+  localStorage.setItem(INV_KEY, JSON.stringify(inventory));
+  clearInvForm();
+  renderInventory();
+  updateInventoryDash(); // 대시보드 알림 업데이트
+}
+
+function clearInvForm() {
+  document.getElementById('inv-name').value = '';
+  document.getElementById('inv-cat').value = '';
+  document.getElementById('inv-spec').value = '';
+  document.getElementById('inv-loc').value = '';
+  document.getElementById('inv-stock').value = '0';
+  document.getElementById('inv-min').value = '5';
+  document.getElementById('inv-vendor').value = '';
+  document.getElementById('inv-worker').value = '';
+  document.getElementById('inv-memo').value = '';
+  document.getElementById('inv-edit-id').value = '';
+  document.getElementById('inv-save-btn').textContent = '품목 등록/수정';
+}
+
+function updateStock(id, amount) {
+  let inventory = getInventory();
+  const idx = inventory.findIndex(i => i.id == id);
+  if (idx > -1) {
+    inventory[idx].stock = Math.max(0, inventory[idx].stock + amount);
+    localStorage.setItem(INV_KEY, JSON.stringify(inventory));
+    renderInventory();
+    updateInventoryDash();
+  }
+}
+
+function deleteInventory(id) {
+  if (!confirm('품목을 삭제하시겠습니까?')) return;
+  localStorage.setItem(INV_KEY, JSON.stringify(getInventory().filter(i => i.id != id)));
+  renderInventory();
+  updateInventoryDash();
+}
+
+function editInventory(id) {
+  const item = getInventory().find(i => i.id == id);
+  if (item) {
+    document.getElementById('inv-name').value = item.name;
+    document.getElementById('inv-cat').value = item.cat || '';
+    document.getElementById('inv-spec').value = item.spec || '';
+    document.getElementById('inv-loc').value = item.loc || '';
+    document.getElementById('inv-stock').value = item.stock;
+    document.getElementById('inv-min').value = item.min;
+    document.getElementById('inv-vendor').value = item.vendor || '';
+    document.getElementById('inv-worker').value = item.worker || '';
+    document.getElementById('inv-memo').value = item.memo || '';
+    document.getElementById('inv-edit-id').value = item.id;
+    document.getElementById('inv-save-btn').textContent = '수정 내용 저장';
+    window.scrollTo({ top: 1600, behavior: 'smooth' });
+  }
+}
+
+function renderInventory() {
+  const tbody = document.getElementById('inv-list-body');
+  if (!tbody) return;
+  const search = document.getElementById('inv-search').value.toLowerCase();
+  let inventory = getInventory();
+  if (search) {
+    inventory = inventory.filter(i => i.name.toLowerCase().includes(search) || (i.cat && i.cat.toLowerCase().includes(search)));
+  }
+  inventory.sort((a, b) => a.name.localeCompare(b.name));
+  tbody.innerHTML = inventory.length ? '' : '<tr><td colspan="8" class="tbl-empty">등록된 재고 품목이 없습니다.</td></tr>';
+  inventory.forEach(i => {
+    const isShort = i.stock <= i.min;
+    const tr = document.createElement('tr');
+    if (isShort) tr.className = 'inv-shortage';
+    tr.innerHTML = `
+      <td>${i.cat || '-'}</td>
+      <td><div style="font-weight:700;">${i.name}</div><div style="font-size:11px; color:var(--text2);">${i.spec || ''}</div></td>
+      <td>${i.loc || '-'}</td>
+      <td style="text-align:right; font-weight:700;">${i.stock.toLocaleString()}</td>
+      <td style="text-align:right; color:var(--text2);">${i.min.toLocaleString()}</td>
+      <td><span class="${isShort ? 'inv-badge-short' : 'inv-badge-ok'}">${isShort ? '재고부족' : '정상'}</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-blue btn-sm" style="padding:2px 8px;" onclick="updateStock(${i.id}, 1)">입고</button>
+          <button class="btn btn-red btn-sm" style="padding:2px 8px;" onclick="updateStock(${i.id}, -1)">출고</button>
+        </div>
+      </td>
+      <td style="text-align:center;">
+        <button class="btn btn-outline btn-sm" onclick="editInventory(${i.id})">수정</button>
+        <button class="btn btn-red btn-sm" onclick="deleteInventory(${i.id})">삭제</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateInventoryDash() {
+  const inventory = getInventory();
+  const shortCount = inventory.filter(i => i.stock <= i.min).length;
+  const grid = document.getElementById('dash-stat-grid');
+  if (!grid) return;
+  
+  // 기존 stat-grid에 재고부족 카드 추가 (없으면 생성, 있으면 업데이트)
+  let invCard = document.getElementById('dash-inv-stat');
+  if (shortCount > 0) {
+    if (!invCard) {
+      const div = document.createElement('div');
+      div.id = 'dash-inv-stat';
+      div.className = 'stat-card red';
+      grid.appendChild(div);
+      invCard = div;
+    }
+    invCard.innerHTML = `<div class="s-label">⚠️ 재고부족 품목</div><div class="s-val">${shortCount}건</div>`;
+    invCard.style.display = 'block';
+  } else if (invCard) {
+    invCard.style.display = 'none';
+  }
+}
+
+// 대시보드 렌더링 시 재고 알림도 함께 표시되도록 showPage에 추가된 로직과 별도로 초기화
+const originalRenderDash = window.renderDash;
+window.renderDash = function() {
+  if (typeof originalRenderDash === 'function') originalRenderDash();
+  updateInventoryDash();
+};
+
+function exportInventoryToExcel() {
+  const inventory = getInventory();
+  if (!inventory.length) { alert('데이터가 없습니다.'); return; }
+  const ws = XLSX.utils.json_to_sheet(inventory.map(i => ({
+    '분류': i.cat, '품목명': i.name, '규격': i.spec, '보관위치': i.loc, '현재재고': i.stock, '최소재고': i.min, '구매업체': i.vendor, '담당자': i.worker, '메모': i.memo
+  })));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "재고관리");
+  XLSX.writeFile(wb, `재고관리현황_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
+function importInventoryFromExcel(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet);
+    
+    let inventory = getInventory();
+    json.forEach(row => {
+      inventory.push({
+        id: Date.now() + Math.random(),
+        cat: row['분류'] || '',
+        name: row['품목명'] || '이름없음',
+        spec: row['규격'] || '',
+        loc: row['보관위치'] || '',
+        stock: parseInt(row['현재재고'] || 0),
+        min: parseInt(row['최소재고'] || 5),
+        vendor: row['구매업체'] || '',
+        worker: row['담당자'] || '',
+        memo: row['메모'] || ''
+      });
+    });
+    localStorage.setItem(INV_KEY, JSON.stringify(inventory));
+    renderInventory();
+    updateInventoryDash();
+    alert(`${json.length}건의 데이터를 가져왔습니다.`);
+  };
+  reader.readAsArrayBuffer(file);
+}
+// --- 재고관리 끝 ---
+
+// --- AI 문서작성 (Add Only) ---
+const AI_KEY = 'office_ai';
+let currentAiType = '공지문';
+
+function initAiDoc() {
+  // 초기화 로직이 필요하면 여기에 작성
+}
+
+function setAiDocType(type, btn) {
+  currentAiType = type;
+  document.querySelectorAll('.ai-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const placeholders = {
+    '공지문': '예) 승강기 점검, 7/15, 10시~12시, 운행중단',
+    '체납독촉장': '예) 101동 101호, 홍길동, 3개월 체납, 50만원, 20일까지 납부요망',
+    '민원답변': '예) 층간소음 민원, 현장확인 완료, 해당 세대 주의 조치, 향후 관리 강화',
+    '회의록': '예) 7월 정기 입대위 회의, 단지 도색 공사 건, 업체 선정 방식 논의'
+  };
+  document.getElementById('ai-input').placeholder = placeholders[type] || '핵심 내용을 키워드 중심으로 입력하세요.';
+}
+
+function generateAiDoc() {
+  const input = document.getElementById('ai-input').value.trim();
+  if (!input) { alert('내용을 입력해주세요.'); return; }
+  
+  const resultArea = document.getElementById('ai-result');
+  resultArea.innerHTML = "📝 AI가 문서를 작성 중입니다...";
+  
+  setTimeout(() => {
+    const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+    let content = "";
+    
+    // 템플릿 엔진 (Prompt Template 방식)
+    if (currentAiType === '공지문') {
+      content = `[공 지 문]\n\n단지 관리 및 발전을 위해 협조해주시는 입주민 여러분께 감사드립니다.\n\n다름이 아니오라 아래와 같이 안내 말씀을 드립니다.\n\n■ 제목: ${input.split('\n')[0]}\n■ 일시: ${input.split('\n')[1] || '별도 공지'}\n■ 내용: ${input}\n\n위와 관련하여 입주민 여러분의 많은 협조 부탁드리며, 이용에 불편을 드려 죄송합니다.\n\n${today}\n\nㅇㅇ아파트 관리사무소장 (직인생략)`;
+    } else if (currentAiType === '체납독촉장') {
+      content = `[미납 관리비 납부 독촉 안내]\n\n귀 세대의 평안을 기원합니다.\n\n관리사무소에서 확인한 결과, 귀 세대의 관리비가 현재 미납된 상태입니다.\n\n■ 대상: ${input.split('\n')[0] || '해당 세대'}\n■ 체납 내역: ${input}\n\n관리비는 단지의 원활한 운영을 위해 필수적인 재원입니다. 미납 시 가산금이 발생할 수 있으니 기한 내 납부를 간곡히 부탁드립니다.\n\n이미 납부하셨다면 본 안내는 폐기해주시기 바랍니다.\n\n${today}\n\nㅇㅇ아파트 관리사무소장`;
+    } else if (currentAiType === '민원답변') {
+      content = `[민원 사항 처리에 대한 답변]\n\n안녕하십니까. 관리사무소입니다.\n접수해주신 민원 사항에 대해 아래와 같이 조치 및 답변 드립니다.\n\n■ 민원 요지: ${input.split('\n')[0]}\n■ 처리 결과: ${input}\n\n항상 입주민의 목소리에 귀 기울이는 관리사무소가 되겠습니다. 추가 문의사항은 관리사무소로 연락 주시기 바랍니다.\n\n${today}\n\nㅇㅇ아파트 관리사무소`;
+    } else {
+      content = `[${currentAiType}]\n\n■ 작성일: ${today}\n■ 관련 내용: \n${input}\n\n--------------------------------------------------\n위 내용은 입력하신 정보를 바탕으로 작성되었습니다.\n내용 확인 후 수정하여 사용하시기 바랍니다.\n\nㅇㅇ아파트 관리사무소`;
+    }
+    
+    resultArea.innerText = content;
+    
+    // 이력 저장
+    let history = JSON.parse(localStorage.getItem(AI_KEY) || '[]');
+    history.unshift({ id: Date.now(), type: currentAiType, input, content, date: today });
+    localStorage.setItem(AI_KEY, JSON.stringify(history.slice(0, 10))); // 최근 10개만 유지
+  }, 800);
+}
+
+function copyAiResult() {
+  const text = document.getElementById('ai-result').innerText;
+  navigator.clipboard.writeText(text).then(() => alert('클립보드에 복사되었습니다.'));
+}
+
+function printAiResult() {
+  const text = document.getElementById('ai-result').innerText;
+  const win = window.open('', '_blank');
+  win.document.write(`<pre style="font-family: sans-serif; padding: 40px; line-height: 1.8; white-space: pre-wrap;">${text}</pre>`);
+  win.document.close();
+  win.print();
+}
+
+function saveAiAsTxt() {
+  const text = document.getElementById('ai-result').innerText;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${currentAiType}_${new Date().getTime()}.txt`;
+  a.click();
+}
+
+function saveAiAsPdf() {
+  const text = document.getElementById('ai-result').innerText;
+  // 간단한 PDF 저장 구현 (jspdf 등이 없으므로 인쇄 창을 통해 PDF 저장을 유도하거나, 현재 환경에서는 인쇄 기능으로 대체 권장)
+  alert('인쇄 창에서 "PDF로 저장"을 선택해주세요.');
+  printAiResult();
+}
+
+function clearAiApp() {
+  document.getElementById('ai-input').value = '';
+  document.getElementById('ai-result').innerText = '작성된 문서가 여기에 표시됩니다.';
+}
+// --- AI 문서작성 끝 ---
+	</script>
+	</body>
 </html>
