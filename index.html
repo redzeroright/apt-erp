@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APT시설 이용료 정산(업무용 ERP 솔루션)V48.BETA</title>
+<title>APT시설 이용료 정산(업무용 ERP 솔루션)V49.BETA</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* 고급스러운 디자인 및 다크모드 지원 CSS */
@@ -561,7 +561,7 @@ tbody tr:last-child td { border-bottom: none; }
 
 <div class="header no-print">
   <div class="header-left">
-    <h1>🏢APT시설 이용료 정산(업무용 ERP 솔루션)V48.beta</h1>
+    <h1>🏢APT시설 이용료 정산(업무용 ERP 솔루션)V49.beta</h1>
     <p>환경설정에서 요금부과설정 수정이 가능합니다</p>
   </div>
   <div class="header-right">
@@ -1292,14 +1292,14 @@ tbody tr:last-child td { border-bottom: none; }
     <div id="page-dash" class="page active">
       <div id="dash-stat-grid" class="stat-grid"></div>
       <div class="card">
-        <div class="card-header"><div class="card-title">✨ v48 업데이트 안내</div></div>
+        <div class="card-header"><div class="card-title">✨ v49 업데이트 안내</div></div>
         <div style="line-height:1.8">
-          <p>• <b>AI문서작성기능(v48):</b>문서 종류별 프롬프트 템플릿을 활용해 전문가 수준의 문서를 즉시 생성.</p>
-          <p>• <b>법정점검 관리기능:</b> 25종의 필수 법정점검 항목을 초기 데이터로 자동 생성.</p>
-          <p>• <b>실시간 알림 및 대시보드:</b> 점검 임박(D-Day) 항목을 색상별로 강조하고, 메인 대시보드와 연동.</p>
-          <p>• <b>시설 마스터 관리:</b>모든 시설물을 고유 ID로 관리하며 기본 정보, 설치일, 모델명 등을 체계적으로 저장.</p>
-          <p>• <b>실시간 KPI 현황판:</b>오늘 일정, 체납 세대, 법정점검 임박, 미처리 민원, 재고 부족 등 10가지 핵심 지표 연동.</p>
-          <p>• <b>오늘 처리 업무 패널:</b>오늘 처리해야 할 일정, 긴급 민원, 부족 재고 등을 자동으로 취합하여 리본 바로 아래에 리스트업.</p>
+          <p>• <b>버그 수정 (v49):</b> 아래 항목들이 수정되었습니다.</p>
+          <p>• <b>동 드롭다운 동기화:</b> 환경설정에서 동 수 변경 시 모든 동 선택 드롭다운이 즉시 갱신됩니다.</p>
+          <p>• <b>전체 세대 자동생성:</b> 648세대 고정이 아닌 환경설정의 <b>동 수 / 세대 수</b>를 기반으로 동적 생성됩니다.</p>
+          <p>• <b>호수 정렬 오류 수정:</b> 조회/고지서 출력에서 호수가 문자순(201 &lt; 99) 대신 숫자순(99 &lt; 201)으로 올바르게 정렬됩니다.</p>
+          <p>• <b>항목 선택 필터 적용:</b> 부과 통합 조회에서 '헬스장/주차/사물함' 항목 선택이 실제 조회 결과에 반영됩니다.</p>
+          <p>• <b>해지 관리 페이지 스타일 수정:</b> 헬스장/주차/사물함 해지 관리 페이지 헤더가 정상 표시됩니다.</p>
           <p>• <b>세대 DB 드롭다운 누락 수정:</b> 초기 로드 시 세대 DB 필터 드롭다운도 올바르게 초기화됩니다.</p>
           <p>• <b>데이터삭제주의:</b> PC를 교체하거나 브라우저 초기화시 '데이터 내보내기(JSON)', '데이터 가져오기', '엑셀 파일 다운로드' 기능을 꼭 사용하십시오.</p>
         </div>
@@ -3851,12 +3851,27 @@ function renderRibbonDashboard() {
 function scrollToSection(id) {
   const el = document.getElementById(id);
   if (el) {
-    const offset = 180; // 리본 높이 고려
-    const bodyRect = document.body.getBoundingClientRect().top;
-    const elementRect = el.getBoundingClientRect().top;
-    const elementPosition = elementRect - bodyRect;
-    const offsetPosition = elementPosition - offset;
-    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+    // 1. 브라우저 내장 scrollIntoView 사용 (가장 확실한 이동 방식)
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // 2. 리본 대시보드 높이만큼 추가 보정 (약간의 시간차를 두어 이동 후 실행)
+    setTimeout(() => {
+      const ribbon = document.getElementById('office-ribbon-container');
+      const ribbonHeight = ribbon ? ribbon.offsetHeight : 180;
+      // scrollIntoView는 요소의 맨 위를 화면 맨 위로 맞추므로, 리본 높이만큼 다시 위로 올려줌
+      window.scrollBy({ top: -(ribbonHeight + 20), behavior: 'smooth' });
+    }, 300);
+
+    // 3. 시각적 활성화 처리
+    document.querySelectorAll('.ribbon-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById('btn-' + id);
+    if (activeBtn) activeBtn.classList.add('active');
+  } else {
+    // 요소를 못 찾을 경우, 강제로 페이지 상단으로 이동 후 재시도
+    console.warn('Section not found:', id);
+    if (id.includes('office')) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 }
 
