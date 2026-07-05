@@ -3981,6 +3981,40 @@ function toggleNotifPanel() {
   }
 }
 // --- 스마트 업무 리본 끝 ---
+
+// ▼▼▼ [신규추가] 자동 백업 경고 팝업 로직 (Add Only, 기존 함수/변수 수정 없음) ▼▼▼
+function showBackupWarningPopup() {
+  var overlay = document.getElementById('backupWarningOverlay');
+  if (overlay) { overlay.style.display = 'flex'; }
+}
+// 1) 프로그램 실행(로딩) 시 경고 팝업 표시 (기존 window.onload 는 건드리지 않고 별도 리스너로 추가)
+window.addEventListener('load', function () {
+  setTimeout(showBackupWarningPopup, 600);
+});
+// 2) 프로그램 사용 중 주기적으로 경고 팝업 재노출 (백업 생활화 유도, 20분 간격)
+setInterval(showBackupWarningPopup, 20 * 60 * 1000);
+// 3) 프로그램 종료(브라우저/탭 닫기, 새로고침) 시 브라우저 표준 이탈 경고 발생시켜 백업 유도
+window.addEventListener('beforeunload', function (e) {
+  e.preventDefault();
+  e.returnValue = '백업(엑셀 다운로드 또는 JSON 내보내기)을 하지 않으면 데이터가 소실될 수 있습니다. 정말 종료하시겠습니까?';
+  return e.returnValue;
+});
+// ▲▲▲ [신규추가] 자동 백업 경고 팝업 로직 끝 ▲▲▲
 	</script>
+	<!-- ▼▼▼ [신규추가] 백업 강제 경고 모달 (Add Only, 기존 코드 영향 없음) ▼▼▼ -->
+	<div id="backupWarningOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:99999; align-items:center; justify-content:center;">
+	  <div style="background:#fff; max-width:480px; width:90%; border-radius:14px; padding:30px 28px; box-shadow:0 10px 40px rgba(0,0,0,0.4); border:4px solid #e53935; text-align:center;">
+	    <div style="font-size:52px; line-height:1;">⚠️</div>
+	    <div style="font-size:22px; font-weight:800; color:#e53935; margin:14px 0 10px;">데이터 백업 필수 경고</div>
+	    <div style="font-size:15px; line-height:1.7; color:#333; text-align:left;">
+	      본 프로그램의 모든 데이터는 <b>현재 사용중인 PC(브라우저)에만 저장</b>됩니다.<br>
+	      PC 교체, 브라우저 초기화, 캐시 삭제, 시스템 오류 등이 발생하면 <b style="color:#e53935;">데이터가 영구적으로 소실</b>될 수 있습니다.<br><br>
+	      반드시 <b>[엑셀 다운로드]</b> 또는 <b>[JSON 내보내기]</b> 기능을 사용하여 정기적으로 백업하시기 바랍니다.<br><br>
+	      <b style="color:#e53935;">백업을 하지 않아 발생하는 데이터 손실에 대한 책임은 전적으로 사용자 본인에게 있으며, 개발자는 이에 대한 어떠한 책임도 지지 않습니다.</b>
+	    </div>
+	    <button onclick="document.getElementById('backupWarningOverlay').style.display='none';" style="margin-top:22px; background:#e53935; color:#fff; border:none; padding:12px 30px; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer;">확인했습니다 (닫기)</button>
+	  </div>
+	</div>
+	<!-- ▲▲▲ [신규추가] 백업 강제 경고 모달 끝 ▲▲▲ -->
 	</body>
 </html>
