@@ -4648,7 +4648,16 @@ async function findDriveBackupFileId() {
     `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name%3D'${encodeURIComponent(GOOGLE_DRIVE_BACKUP_FILENAME)}'&fields=files(id,name,modifiedTime)`,
     { headers: { Authorization: `Bearer ${googleAccessToken}` } }
   );
-  if (!res.ok) throw new Error('드라이브 파일 목록 조회 실패 (' + res.status + ')');
+  if (!res.ok) {
+    // 🔒 진단 강화: 구글이 보내주는 실제 상세 오류 메시지까지 함께 표시 (Add Only)
+    let detail = '';
+    try {
+      const errBody = await res.json();
+      detail = errBody?.error?.message || errBody?.error?.status || JSON.stringify(errBody);
+    } catch (e) { /* 응답이 JSON이 아닐 경우 무시 */ }
+    console.error('findDriveBackupFileId 상세 오류:', detail);
+    throw new Error('드라이브 파일 목록 조회 실패 (' + res.status + ')' + (detail ? ' - ' + detail : ''));
+  }
   const data = await res.json();
   if (data.files && data.files.length > 0) return data.files[0];
   return null;
@@ -4810,7 +4819,16 @@ async function findDriveDbFileId() {
     `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name%3D'${encodeURIComponent(GOOGLE_DRIVE_LIVE_SYNC_FILENAME)}'&fields=files(id,name,modifiedTime)`,
     { headers: { Authorization: `Bearer ${googleAccessToken}` } }
   );
-  if (!res.ok) throw new Error('드라이브 파일 목록 조회 실패 (' + res.status + ')');
+  if (!res.ok) {
+    // 🔒 진단 강화: 구글이 보내주는 실제 상세 오류 메시지까지 함께 표시 (Add Only)
+    let detail = '';
+    try {
+      const errBody = await res.json();
+      detail = errBody?.error?.message || errBody?.error?.status || JSON.stringify(errBody);
+    } catch (e) { /* 응답이 JSON이 아닐 경우 무시 */ }
+    console.error('findDriveDbFileId 상세 오류:', detail);
+    throw new Error('드라이브 파일 목록 조회 실패 (' + res.status + ')' + (detail ? ' - ' + detail : ''));
+  }
   const data = await res.json();
   if (data.files && data.files.length > 0) return data.files[0];
   return null;
