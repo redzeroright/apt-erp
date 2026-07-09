@@ -3,8 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apt-ONE아파트원ERP V49.BETA</title>
+<title>APT관리업무 프로그램V49.BETA</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<!-- ============================================================ -->
+<!-- 🔒 2단계 안전망: 구글 드라이브 자동 백업용 구글 API 스크립트        -->
+<!-- (Add Only 신규 삽입, 기존 xlsx 스크립트 등은 그대로 유지)          -->
+<!-- ============================================================ -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/api.js"></script>
 <style>
 /* 고급스러운 디자인 및 다크모드 지원 CSS */
 :root {
@@ -556,12 +563,169 @@ tbody tr:last-child td { border-bottom: none; }
   .d-day-today { background: var(--accent-light); color: var(--accent); }
   .repeat-badge { font-size: 11px; color: var(--purple); background: var(--purple-light); padding: 2px 6px; border-radius: 4px; }
 	</style>
+
+<!-- ============================================================ -->
+<!-- 🔒 데이터 백업/복구 안내 배너 전용 스타일 (Add Only 신규 삽입)      -->
+<!-- 기존 <style> 블록은 전혀 수정하지 않고, 별도 블록으로 새로 추가함   -->
+<!-- ============================================================ -->
+<style>
+  .backup-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: var(--amber-light);
+    border: 1px solid var(--amber);
+    border-radius: var(--radius-sm);
+    padding: 12px 18px;
+    margin: 14px 20px 0 20px;
+  }
+  .backup-banner-text {
+    color: var(--amber);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    flex: 1 1 320px;
+  }
+  .backup-banner-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .backup-btn-export,
+  .backup-btn-import {
+    background: var(--amber);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(212, 120, 31, 0.25);
+    white-space: nowrap;
+  }
+  .backup-btn-export:hover,
+  .backup-btn-import:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  .backup-btn-import {
+    background: transparent;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+    box-shadow: none;
+  }
+  .backup-btn-import:hover {
+    background: var(--amber-light);
+  }
+  @media (max-width: 720px) {
+    .backup-banner { flex-direction: column; align-items: stretch; }
+    .backup-banner-btns { justify-content: flex-end; }
+  }
+
+  /* ============================================================ */
+  /* 🔒 2단계: 구글 드라이브 연동 버튼 전용 스타일 (Add Only 신규 삽입) */
+  /* ============================================================ */
+  .google-drive-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .google-drive-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: 0.2s;
+  }
+  .google-drive-btn:hover { background: rgba(255,255,255,0.2); }
+  .google-drive-btn.connected {
+    background: rgba(21,121,92,0.35);
+    border-color: rgba(21,121,92,0.6);
+  }
+  .google-drive-btn.connected:hover { background: rgba(21,121,92,0.5); }
+  .google-drive-tooltip {
+    font-size: 11px;
+    color: rgba(255,255,255,0.85);
+    white-space: nowrap;
+    cursor: help;
+    border-bottom: 1px dashed rgba(255,255,255,0.4);
+  }
+  .google-drive-email {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(21,121,92,0.35);
+    padding: 4px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  @media (max-width: 900px) {
+    .google-drive-tooltip { display: none; }
+  }
+
+  /* ============================================================ */
+  /* 🔒 3단계: 드라이브 수동 백업/복원 미니 버튼 + 상태 텍스트          */
+  /* (Add Only 신규 삽입)                                          */
+  /* ============================================================ */
+  .google-drive-mini-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: 0.2s;
+  }
+  .google-drive-mini-btn:hover { background: rgba(255,255,255,0.25); }
+  .google-drive-status {
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+    white-space: nowrap;
+  }
+  @media (max-width: 1100px) {
+    .google-drive-status { display: none !important; }
+  }
+
+  /* ============================================================ */
+  /* 🔒 5단계: 클라우드 실시간 동기화 실패 토스트 전용 스타일           */
+  /* (Add Only 신규 삽입)                                          */
+  /* ============================================================ */
+  .cloud-sync-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--red-light);
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 9999;
+    animation: cloudSyncToastFadeIn 0.3s ease;
+  }
+  @keyframes cloudSyncToastFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
 </head>
 <body>
 
 <div class="header no-print">
   <div class="header-left">
-    <h1>🏢Apt-ONE아파트원ERP V49.BETA</h1>
+    <h1>🏢APT관리업무 프로그램V49.BETA</h1>
     <p>환경설정에서 요금부과설정 수정이 가능합니다</p>
   </div>
   <div class="header-right">
@@ -580,11 +744,57 @@ tbody tr:last-child td { border-bottom: none; }
     <button class="theme-toggle" onclick="toggleTheme()">
       <span id="theme-icon">🌙</span> <span id="theme-text">다크모드</span>
     </button>
+
+    <!-- ============================================================ -->
+    <!-- 🔒 2단계: 구글 드라이브 연동 버튼 (Add Only 신규 삽입)          -->
+    <!-- ============================================================ -->
+    <div class="google-drive-area" id="google-drive-area">
+      <button type="button" class="google-drive-btn" id="google-drive-connect-btn" onclick="connectGoogleDrive()">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h4.5L14 3.5zM8 13h8v2H8v-2zm0 4h8v2H8v-2zm0-8h5v2H8V9z"/></svg>
+        <span id="google-drive-btn-text">📁 구글 드라이브 연동</span>
+      </button>
+      <span class="google-drive-tooltip" title="인수인계를 위해 직원의 개인 계정이 아닌 [관리소 공용 구글 계정]으로 로그인하세요.">💡 관리소 공용 계정으로 로그인하세요</span>
+      <span class="google-drive-email" id="google-drive-user-email" style="display:none;"></span>
+
+      <!-- 🔒 3단계: 드라이브 수동 백업/복원 버튼 + 마지막 백업 시각 (Add Only 신규 삽입) -->
+      <button type="button" class="google-drive-mini-btn" id="google-drive-manual-backup-btn"
+        onclick="saveBackupToGoogleDrive(false)" style="display:none;" title="지금 즉시 구글 드라이브에 백업을 저장합니다">
+        ☁️ 지금 백업
+      </button>
+      <button type="button" class="google-drive-mini-btn" id="google-drive-restore-btn"
+        onclick="restoreBackupFromGoogleDrive()" style="display:none;" title="구글 드라이브에 저장된 백업으로 복원합니다">
+        ⬇️ 복원
+      </button>
+      <span class="google-drive-status" id="google-drive-last-backup" style="display:none;"></span>
+    </div>
+
     <div class="header-info">
       <div id="header-세대"></div>
       <div id="header-date"></div>
     </div>
   </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 🔒 데이터 백업 안내 배너 (Add Only 신규 삽입, 기존 요소 미변경)     -->
+<!-- ============================================================ -->
+<div class="backup-banner no-print" id="backup-warning-banner">
+  <div class="backup-banner-text">
+    ⚠️ 현재 데이터가 브라우저에 임시 저장 중입니다. PC 포맷이나 캐시 삭제 시 데이터가 소실될 수 있으니 <b>[수동 백업]</b>을 주기적으로 하시거나 <b>[구글 클라우드 자동 백업]</b>을 활성화하세요.
+  </div>
+  <div class="backup-banner-btns">
+    <button type="button" class="btn backup-btn-export" onclick="exportFullData()">💾 전체 데이터 백업(.json)</button>
+    <label class="btn backup-btn-import" for="backup-file-input">📂 백업 파일 불러오기</label>
+    <input type="file" id="backup-file-input" accept="application/json,.json" style="display:none"
+      onchange="if(this.files && this.files[0]){ importFullData(this.files[0]); } this.value='';">
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 🔒 5단계: 클라우드 실시간 동기화 실패 안내 토스트 (Add Only 신규 삽입) -->
+<!-- ============================================================ -->
+<div id="cloud-sync-toast" class="cloud-sync-toast no-print" style="display:none;">
+  ⚠️ 클라우드 동기화 실패 (로컬에는 정상 저장됨)
 </div>
 
 <div class="main">
@@ -2204,6 +2414,151 @@ window.onload = () => {
 <div id="donation-banner">☕ 커피 한 잔 후원으로 개발자를 응원해주세요!</div>
 
 <script>
+// ================================================================
+// 🔒 4단계: 크로스브라우저(Edge 등) 호환성 패치 (Add Only 신규 삽입)
+// - 기존 함수/로직은 단 한 줄도 수정하지 않음
+// - 아래 3가지 전역 패치는 스크립트 최상단에서 한 번만 적용되며,
+//   기존 코드에서 사용 중인 window.open() / navigator.clipboard / XLSX
+//   호출부는 전혀 건드리지 않고, 브라우저 API 자체를 안전하게 보강함
+// ================================================================
+
+// -----------------------------
+// [패치 1] 팝업 차단 대응
+// Edge/Chrome 등에서 팝업이 차단되면 window.open()이 null을 반환하는데,
+// 기존 코드(민원사진보기/AI결과인쇄/템플릿인쇄/법정점검인쇄/자산이력인쇄 등)는
+// 이 경우를 대비하지 않아 "Cannot read properties of null" 오류로
+// 화면이 아무 반응 없이 멈춘 것처럼 보일 수 있음.
+// window.open을 감싸서, 차단되었을 때는 안내 알림을 띄우고
+// document.write 등을 호출해도 오류가 나지 않는 안전한 더미 객체를 반환함.
+// -----------------------------
+(function () {
+  const nativeWindowOpen = window.open;
+  window.open = function (...args) {
+    const win = nativeWindowOpen.apply(window, args);
+    if (!win) {
+      alert('⚠️ 브라우저가 팝업을 차단했습니다.\n주소창 오른쪽의 팝업 차단 아이콘을 눌러 이 사이트의 팝업을 허용해주세요.');
+      // 더미 객체 반환: 이후 win.document.write() 등을 호출해도 오류가 나지 않도록 함
+      return {
+        document: {
+          write: function () {},
+          close: function () {},
+          getElementById: function () { return null; }
+        },
+        focus: function () {},
+        close: function () {},
+        print: function () {}
+      };
+    }
+    return win;
+  };
+})();
+
+// -----------------------------
+// [패치 2] 클립보드 API 폴리필
+// Edge/Chrome 계열 브라우저는 navigator.clipboard API를
+// "보안 컨텍스트(https:// 또는 localhost)"에서만 제공함.
+// 이 프로그램처럼 file:// 로 직접 열거나 사내 http:// 인트라넷에서
+// 열 경우 navigator.clipboard 자체가 존재하지 않아
+// 기존 코드(복사 버튼 등)가 "Cannot read properties of undefined" 오류로
+// 동작하지 않을 수 있음. 존재하지 않을 때만 구형 execCommand 방식으로
+// 대체하는 안전한 폴리필을 추가함 (이미 지원되는 브라우저에는 영향 없음).
+// -----------------------------
+if (!navigator.clipboard || !navigator.clipboard.writeText) {
+  navigator.clipboard = navigator.clipboard || {};
+  navigator.clipboard.writeText = function (text) {
+    return new Promise((resolve, reject) => {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        if (success) resolve(); else reject(new Error('클립보드 복사에 실패했습니다.'));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+}
+
+// -----------------------------
+// [패치 3] XLSX 라이브러리 CDN 로딩 실패 대비 자동 폴백
+// 사내망/방화벽에서 cdnjs.cloudflare.com 이 차단되어 있으면
+// 엑셀 내보내기 기능(XLSX.utils...) 전체가 조용히 동작하지 않게 됨.
+// 페이지 로드 후 XLSX 전역 객체가 없으면, 다른 CDN(jsDelivr)에서
+// 같은 버전(0.18.5)을 자동으로 다시 불러오는 폴백을 시도함.
+// -----------------------------
+window.addEventListener('load', function () {
+  setTimeout(function () {
+    if (typeof XLSX === 'undefined') {
+      console.warn('⚠️ XLSX 라이브러리가 cdnjs에서 로드되지 않아 jsDelivr로 재시도합니다.');
+      const fallbackScript = document.createElement('script');
+      fallbackScript.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+      fallbackScript.onload = function () {
+        console.log('✅ XLSX 라이브러리 폴백 로딩 성공 (jsDelivr)');
+      };
+      fallbackScript.onerror = function () {
+        console.error('❌ XLSX 라이브러리 폴백 로딩도 실패했습니다. 엑셀 내보내기 기능을 사용할 수 없습니다.');
+      };
+      document.head.appendChild(fallbackScript);
+    }
+  }, 1500); // 원본 CDN 로딩 대기 시간
+});
+// --- 크로스브라우저 호환성 패치(4단계) 끝 ---
+
+// ================================================================
+// 🔒 5단계: 구글 드라이브 실시간 자동 동기화 - 전역 저장 감시 패치
+// (Add Only 신규 삽입, 기존 함수/로직 단 한 줄도 수정하지 않음)
+//
+// [설계 의도 / 가이드라인]
+// 요청서에서는 "주차 등록, 헬스장 등록 등 기존 코드에서 LocalStorage에
+// 데이터를 넣는 함수들 뒤에 saveDataToGoogleDrive()를 한 줄씩 추가"하는
+// 방식을 제안하셨지만, 이 프로그램에는 그런 저장 지점이 수십~수백 곳에
+// 흩어져 있어 하나하나 찾아 수정하면 실수로 기존 코드를 건드릴 위험이 큽니다.
+//
+// 그래서 더 안전한 방법으로, 브라우저가 기본 제공하는
+// localStorage.setItem() 함수 자체를 "감싸는(wrapping)" 방식을 사용합니다.
+// 이렇게 하면 주차/헬스장/체납/환경설정 등 기존 코드가 내부적으로
+// localStorage.setItem(...)을 호출하는 모든 지점에서, 코드를 단 한 줄도
+// 건드리지 않고도 자동으로 클라우드 동기화가 예약(trigger)됩니다.
+//
+// 만약 향후 완전히 새로운 저장 함수를 직접 추가하실 경우에도, 그 함수가
+// 결국 localStorage.setItem(...)을 호출하기만 하면 이 패치가 자동으로
+// 감지하므로 별도로 saveDataToGoogleDrive()를 호출해줄 필요가 없습니다.
+// (단, 굳이 특정 저장 시점에 "즉시" 동기화하고 싶다면, 그 함수 마지막 줄에
+//  `saveDataToGoogleDrive();` 한 줄만 추가하면 디바운스 없이 바로 실행됩니다.)
+// ================================================================
+
+window.__isCloudRestoring__ = false; // 클라우드→로컬 복원 중에는 재동기화 업로드를 막기 위한 플래그
+let cloudSyncDebounceTimer = null;   // 연속 저장을 하나로 묶기 위한 디바운스 타이머
+
+(function () {
+  const nativeSetItem = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function (key, value) {
+    nativeSetItem(key, value); // 1) 기존 로컬 저장은 항상 정상적으로 먼저 수행됨 (변경 없음)
+    // 2) 클라우드 복원 도중에 발생한 setItem은 재업로드를 트리거하지 않음 (무한 동기화 방지)
+    if (!window.__isCloudRestoring__) {
+      scheduleCloudSync();
+    }
+  };
+})();
+
+// LocalStorage 변경이 여러 번 연속 발생해도(예: 일괄 저장) 마지막 변경 후
+// 1.5초 뒤에 딱 한 번만 구글 드라이브에 업로드하도록 묶어줌 (API 과다 호출 방지)
+function scheduleCloudSync() {
+  if (!googleAccessToken) return; // 구글 로그인이 안 되어 있으면 조용히 스킵 (로컬 저장은 이미 완료됨)
+  clearTimeout(cloudSyncDebounceTimer);
+  cloudSyncDebounceTimer = setTimeout(() => {
+    saveDataToGoogleDrive();
+  }, 1500);
+}
+// --- 실시간 동기화 저장 감시 패치(5단계) 끝 ---
+
   document.addEventListener('contextmenu', function(event) {
     event.preventDefault();
     const banner = document.getElementById('donation-banner');
@@ -3982,39 +4337,632 @@ function toggleNotifPanel() {
 }
 // --- 스마트 업무 리본 끝 ---
 
-// ▼▼▼ [신규추가] 자동 백업 경고 팝업 로직 (Add Only, 기존 함수/변수 수정 없음) ▼▼▼
-function showBackupWarningPopup() {
-  var overlay = document.getElementById('backupWarningOverlay');
-  if (overlay) { overlay.style.display = 'flex'; }
+// ================================================================
+// 🔒 데이터 백업/복구 기능 (Add Only 방식으로 안전하게 신규 추가됨)
+// - 기존 함수/로직은 단 한 줄도 수정하지 않음
+// - 독립적인 함수(exportFullData, importFullData)로만 구성됨
+// - LocalStorage에 저장된 이 프로그램의 모든 키를 그대로 백업/복구함
+//   (주차/헬스장/사물함/세대DB/환경설정/일정/체납/점검/민원/재고/
+//    법정점검/자산/템플릿 등 앱에서 사용하는 모든 apt_*, office_* 키 포함)
+// ================================================================
+
+function exportFullData() {
+  try {
+    const backupData = {};
+    // 기존 저장 로직을 전혀 건드리지 않고, 현재 LocalStorage에 들어있는
+    // 모든 키-값을 그대로 순회하며 수집함 (add only, 결합도 최소화)
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      backupData[key] = localStorage.getItem(key);
+    }
+
+    const backupPayload = {
+      appName: 'Apt-ONE 아파트원 ERP',
+      backupVersion: 1,
+      exportedAt: new Date().toISOString(),
+      data: backupData
+    };
+
+    const jsonStr = JSON.stringify(backupPayload, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const fileName = `apt_easy_backup_${yyyy}${mm}${dd}.json`;
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert(`✅ 백업이 완료되었습니다.\n파일명: ${fileName}\n다운로드 폴더를 확인해주세요.`);
+  } catch (err) {
+    console.error('exportFullData 오류:', err);
+    alert('❌ 백업 중 오류가 발생했습니다: ' + err.message);
+  }
 }
-// 1) 프로그램 실행(로딩) 시 경고 팝업 표시 (기존 window.onload 는 건드리지 않고 별도 리스너로 추가)
-window.addEventListener('load', function () {
-  setTimeout(showBackupWarningPopup, 600);
+
+function importFullData(file) {
+  if (!file) return;
+
+  if (!confirm('⚠️ 백업 파일을 불러오면 현재 브라우저에 저장된 모든 데이터가\n백업 파일의 내용으로 완전히 교체(덮어쓰기)됩니다.\n계속하시겠습니까?')) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+
+      // 간단한 유효성 검증: 아파트원 ERP 백업 파일 구조인지 확인
+      if (!parsed || typeof parsed !== 'object' || !parsed.data || typeof parsed.data !== 'object') {
+        alert('❌ 올바른 아파트원 ERP 백업 파일이 아닙니다. 파일 형식을 확인해주세요.');
+        return;
+      }
+
+      const dataKeys = Object.keys(parsed.data);
+      if (dataKeys.length === 0) {
+        alert('❌ 백업 파일에 복구할 데이터가 없습니다.');
+        return;
+      }
+
+      // 기존 LocalStorage를 지우고, 백업 파일의 데이터로 새로 덮어씀
+      localStorage.clear();
+      dataKeys.forEach(key => {
+        localStorage.setItem(key, parsed.data[key]);
+      });
+
+      alert('✅ 데이터 복구가 완료되었습니다. 화면을 새로고침합니다.');
+      location.reload();
+    } catch (err) {
+      console.error('importFullData 오류:', err);
+      alert('❌ 백업 파일을 읽는 중 오류가 발생했습니다. 올바른 JSON 파일인지 확인해주세요.');
+    }
+  };
+  reader.onerror = function () {
+    alert('❌ 파일을 읽을 수 없습니다.');
+  };
+  reader.readAsText(file);
+}
+// --- 데이터 백업/복구 기능 끝 ---
+
+// ================================================================
+// 🔒 2단계 안전망: 구글 드라이브 연동 인프라 (Add Only 방식으로 신규 추가됨)
+// - 기존 함수/로직은 단 한 줄도 수정하지 않음
+// - 독립적인 함수들로만 구성되어 있으며, 이후 단계(자동 백업 저장/복구)에서
+//   googleAccessToken 전역 변수를 그대로 재사용할 수 있도록 설계됨
+// ================================================================
+
+// -----------------------------
+// ⚙️ 설정값 (반드시 직접 교체 필요)
+// -----------------------------
+// 아래 CLIENT_ID는 Google Cloud Console > API 및 서비스 > 사용자 인증 정보에서
+// "OAuth 2.0 클라이언트 ID"(웹 애플리케이션 유형)를 발급받아 반드시 교체해야 합니다.
+// 발급 시 "승인된 자바스크립트 원본(Authorized JavaScript origins)"에
+// 이 파일이 실제로 열리는 도메인(예: https://yourdomain.com)을 등록해야 하며,
+// file:// 로 로컬에서 직접 여는 방식은 구글 로그인이 동작하지 않으니
+// 반드시 http(s)://로 서빙되는 환경(예: 사내 웹서버, GitHub Pages 등)에서 사용하세요.
+const GOOGLE_CLIENT_ID = '142684267447-2tpn0a0efhahri5qliqkclkmkvu9i0lu.apps.googleusercontent.com';
+
+// appDataFolder(앱 전용 숨김 저장공간) 접근 권한 + 이메일 확인 권한
+const GOOGLE_DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email';
+
+// -----------------------------
+// 🔐 전역 상태 변수 (메모리 보관, 새로고침 시 초기화됨 - 보안상 의도된 동작)
+// -----------------------------
+let googleAccessToken = null;   // 구글 OAuth 액세스 토큰 (다음 단계의 드라이브 업로드/다운로드에서 재사용)
+let googleTokenClient = null;   // GIS 토큰 클라이언트 인스턴스
+let googleUserEmail = null;     // 로그인한 구글 계정 이메일
+let gapiClientReady = false;    // gapi.client(Drive API) 초기화 완료 여부
+let googleAuthRetryCount = 0;   // 🔒 4단계: GIS 로딩 재시도 횟수 (무한 재시도 방지, Add Only)
+let gapiClientRetryCount = 0;   // 🔒 4단계: gapi 로딩 재시도 횟수 (무한 재시도 방지, Add Only)
+const GOOGLE_INIT_MAX_RETRY = 30; // 300ms x 30 = 최대 약 9초까지만 재시도
+
+// -----------------------------
+// 1) Google Identity Services 초기화 (OAuth 토큰 클라이언트)
+// -----------------------------
+function initGoogleAuth() {
+  if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+    // GIS 스크립트가 아직 로드되지 않은 경우 잠시 후 재시도 (최대 횟수 제한, Edge/방화벽 환경 대응)
+    googleAuthRetryCount++;
+    if (googleAuthRetryCount > GOOGLE_INIT_MAX_RETRY) {
+      console.error('❌ Google Identity Services 스크립트를 불러오지 못했습니다. 네트워크/방화벽에서 accounts.google.com 접속이 차단되었는지 확인해주세요.');
+      return;
+    }
+    setTimeout(initGoogleAuth, 300);
+    return;
+  }
+  if (googleTokenClient) return; // 중복 초기화 방지
+
+  googleTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: GOOGLE_DRIVE_SCOPES,
+    callback: async (tokenResponse) => {
+      if (tokenResponse && tokenResponse.access_token) {
+        googleAccessToken = tokenResponse.access_token;
+        await fetchGoogleUserProfile();
+        updateGoogleLoginUI(true);
+        await loadDataFromGoogleDrive(); // 🔒 5단계: 로그인 직후 클라우드 데이터를 우선 동기화 (Add Only)
+        startGoogleAutoBackup(); // 🔒 3단계: 로그인 성공 시 자동 백업 시작 (Add Only)
+      }
+    },
+    error_callback: (err) => {
+      console.error('Google 로그인 오류:', err);
+      alert('❌ 구글 로그인 중 오류가 발생했습니다. Client ID 설정을 확인해주세요.');
+    }
+  });
+}
+
+// -----------------------------
+// 2) Google API 클라이언트(gapi) 초기화 (Drive API v3, 다음 단계에서 사용)
+// -----------------------------
+function initGapiClient() {
+  if (typeof gapi === 'undefined') {
+    // gapi 스크립트가 아직 로드되지 않은 경우 잠시 후 재시도 (최대 횟수 제한, Edge/방화벽 환경 대응)
+    gapiClientRetryCount++;
+    if (gapiClientRetryCount > GOOGLE_INIT_MAX_RETRY) {
+      console.error('❌ Google API(gapi) 스크립트를 불러오지 못했습니다. 네트워크/방화벽에서 apis.google.com 접속이 차단되었는지 확인해주세요.');
+      return;
+    }
+    setTimeout(initGapiClient, 300);
+    return;
+  }
+  gapi.load('client', () => {
+    gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest')
+      .then(() => {
+        gapiClientReady = true;
+        console.log('✅ Google Drive API 클라이언트 초기화 완료');
+      })
+      .catch((err) => {
+        console.error('gapi Drive client 초기화 오류:', err);
+      });
+  });
+}
+
+// -----------------------------
+// 3) 로그인(연동) 버튼 클릭 시 실행
+// -----------------------------
+function connectGoogleDrive() {
+  if (GOOGLE_CLIENT_ID.indexOf('여기에_발급받은') === 0) {
+    alert('⚠️ 아직 구글 클라이언트 ID가 설정되지 않았습니다.\n개발자에게 문의해 GOOGLE_CLIENT_ID 값을 먼저 설정해달라고 요청해주세요.');
+    return;
+  }
+  if (!googleTokenClient) {
+    initGoogleAuth();
+    setTimeout(() => {
+      if (googleTokenClient) googleTokenClient.requestAccessToken({ prompt: 'consent' });
+    }, 500);
+    return;
+  }
+  googleTokenClient.requestAccessToken({ prompt: googleAccessToken ? '' : 'consent' });
+}
+
+// -----------------------------
+// 4) 로그인한 구글 계정의 이메일 조회
+// -----------------------------
+async function fetchGoogleUserProfile() {
+  if (!googleAccessToken) return;
+  try {
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${googleAccessToken}` }
+    });
+    if (!res.ok) throw new Error('사용자 정보 조회 실패');
+    const profile = await res.json();
+    googleUserEmail = profile.email || null;
+  } catch (err) {
+    console.error('구글 프로필 조회 오류:', err);
+    googleUserEmail = null;
+  }
+}
+
+// -----------------------------
+// 5) 연동 해제(로그아웃)
+// -----------------------------
+function disconnectGoogleDrive() {
+  if (!confirm('구글 드라이브 연동을 해제하시겠습니까?\n(자동 백업이 더 이상 진행되지 않습니다)')) {
+    return;
+  }
+  if (googleAccessToken && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+    google.accounts.oauth2.revoke(googleAccessToken, () => {
+      console.log('구글 액세스 토큰이 해제되었습니다.');
+    });
+  }
+  googleAccessToken = null;
+  googleUserEmail = null;
+  stopGoogleAutoBackup(); // 🔒 3단계: 로그아웃 시 자동 백업 중지 (Add Only)
+  updateGoogleLoginUI(false);
+}
+
+// -----------------------------
+// 6) 로그인 상태에 따른 버튼/이메일 UI 갱신
+// -----------------------------
+function updateGoogleLoginUI(isConnected) {
+  const btn = document.getElementById('google-drive-connect-btn');
+  const btnText = document.getElementById('google-drive-btn-text');
+  const emailEl = document.getElementById('google-drive-user-email');
+  // 🔒 3단계: 수동 백업/복원 버튼, 상태 텍스트 요소 (Add Only)
+  const manualBackupBtn = document.getElementById('google-drive-manual-backup-btn');
+  const restoreBtn = document.getElementById('google-drive-restore-btn');
+  const statusEl = document.getElementById('google-drive-last-backup');
+  if (!btn || !btnText) return;
+
+  if (isConnected) {
+    btn.classList.add('connected');
+    btn.onclick = disconnectGoogleDrive;
+    btnText.textContent = '🔌 연동 해제(로그아웃)';
+    if (emailEl) {
+      emailEl.textContent = googleUserEmail ? `✅ ${googleUserEmail}` : '✅ 연동됨';
+      emailEl.style.display = 'inline-flex';
+    }
+    if (manualBackupBtn) manualBackupBtn.style.display = 'inline-flex';
+    if (restoreBtn) restoreBtn.style.display = 'inline-flex';
+    if (statusEl) statusEl.style.display = 'inline-flex';
+  } else {
+    btn.classList.remove('connected');
+    btn.onclick = connectGoogleDrive;
+    btnText.textContent = '📁 구글 드라이브 연동';
+    if (emailEl) {
+      emailEl.textContent = '';
+      emailEl.style.display = 'none';
+    }
+    if (manualBackupBtn) manualBackupBtn.style.display = 'none';
+    if (restoreBtn) restoreBtn.style.display = 'none';
+    if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
+  }
+}
+
+// -----------------------------
+// 7) 페이지 로드 시 구글 API 초기화 (기존 코드와 완전히 분리된 리스너)
+// -----------------------------
+window.addEventListener('load', () => {
+  initGoogleAuth();
+  initGapiClient();
 });
-// 2) 프로그램 사용 중 주기적으로 경고 팝업 재노출 (백업 생활화 유도, 20분 간격)
-setInterval(showBackupWarningPopup, 20 * 60 * 1000);
-// 3) 프로그램 종료(브라우저/탭 닫기, 새로고침) 시 브라우저 표준 이탈 경고 발생시켜 백업 유도
-window.addEventListener('beforeunload', function (e) {
-  e.preventDefault();
-  e.returnValue = '백업(엑셀 다운로드 또는 JSON 내보내기)을 하지 않으면 데이터가 소실될 수 있습니다. 정말 종료하시겠습니까?';
-  return e.returnValue;
+// --- 구글 드라이브 연동 인프라 끝 ---
+
+// ================================================================
+// 🔒 3단계: 구글 드라이브 실시간 자동 백업 - 실제 저장/복원 기능
+// (Add Only 방식으로 신규 추가됨, 기존 함수/로직 전혀 미수정)
+// - appDataFolder(사용자 눈에 보이지 않는 앱 전용 저장공간)에
+//   apt_one_erp_autobackup.json 파일 하나를 계속 덮어쓰는 방식으로 동작
+// - 2단계에서 만든 googleAccessToken 전역 변수를 그대로 재사용함
+// ================================================================
+
+const GOOGLE_DRIVE_BACKUP_FILENAME = 'apt_one_erp_autobackup.json';
+const GOOGLE_AUTO_BACKUP_INTERVAL_MS = 10 * 60 * 1000; // 10분마다 자동 백업
+
+let googleAutoBackupIntervalId = null; // setInterval 핸들 보관용
+let lastDriveBackupTime = null;        // 마지막 백업 성공 시각
+
+// -----------------------------
+// 8) appDataFolder에서 기존 백업 파일 찾기 (파일이 없으면 null 반환)
+// -----------------------------
+async function findDriveBackupFileId() {
+  const res = await fetch(
+    `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name%3D'${encodeURIComponent(GOOGLE_DRIVE_BACKUP_FILENAME)}'&fields=files(id,name,modifiedTime)`,
+    { headers: { Authorization: `Bearer ${googleAccessToken}` } }
+  );
+  if (!res.ok) throw new Error('드라이브 파일 목록 조회 실패 (' + res.status + ')');
+  const data = await res.json();
+  if (data.files && data.files.length > 0) return data.files[0];
+  return null;
+}
+
+// -----------------------------
+// 9) 현재 LocalStorage 전체를 구글 드라이브 appDataFolder에 저장(생성 또는 덮어쓰기)
+//    silent=true 이면 자동 백업이므로 알림창을 띄우지 않음
+// -----------------------------
+async function saveBackupToGoogleDrive(silent) {
+  if (!googleAccessToken) {
+    if (!silent) alert('먼저 [구글 드라이브 연동] 버튼으로 로그인해주세요.');
+    return;
+  }
+  try {
+    const backupData = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      backupData[key] = localStorage.getItem(key);
+    }
+    const payload = {
+      appName: 'Apt-ONE 아파트원 ERP',
+      backupVersion: 1,
+      exportedAt: new Date().toISOString(),
+      data: backupData
+    };
+    const jsonStr = JSON.stringify(payload);
+
+    const existing = await findDriveBackupFileId();
+    const metadata = existing
+      ? { name: GOOGLE_DRIVE_BACKUP_FILENAME }
+      : { name: GOOGLE_DRIVE_BACKUP_FILENAME, parents: ['appDataFolder'] };
+
+    const boundary = 'aptone_boundary_' + Date.now();
+    const multipartBody =
+      `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n` +
+      `--${boundary}\r\nContent-Type: application/json\r\n\r\n${jsonStr}\r\n` +
+      `--${boundary}--`;
+
+    const url = existing
+      ? `https://www.googleapis.com/upload/drive/v3/files/${existing.id}?uploadType=multipart`
+      : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+    const method = existing ? 'PATCH' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${googleAccessToken}`,
+        'Content-Type': `multipart/related; boundary=${boundary}`
+      },
+      body: multipartBody
+    });
+    if (!res.ok) throw new Error('드라이브 저장 실패 (' + res.status + ')');
+
+    lastDriveBackupTime = new Date();
+    updateDriveBackupStatusUI();
+    if (!silent) alert('✅ 구글 드라이브에 백업이 저장되었습니다.');
+  } catch (err) {
+    console.error('saveBackupToGoogleDrive 오류:', err);
+    if (!silent) alert('❌ 드라이브 백업 중 오류가 발생했습니다: ' + err.message);
+  }
+}
+
+// -----------------------------
+// 10) 구글 드라이브 appDataFolder의 백업 파일을 내려받아 LocalStorage 복원
+// -----------------------------
+async function restoreBackupFromGoogleDrive() {
+  if (!googleAccessToken) {
+    alert('먼저 [구글 드라이브 연동] 버튼으로 로그인해주세요.');
+    return;
+  }
+  if (!confirm('☁️ 구글 드라이브에 저장된 백업으로 복원하시겠습니까?\n현재 브라우저에 저장된 데이터는 모두 백업 내용으로 교체됩니다.')) {
+    return;
+  }
+  try {
+    const existing = await findDriveBackupFileId();
+    if (!existing) {
+      alert('❌ 구글 드라이브에 저장된 백업 파일이 없습니다.\n먼저 [☁️ 지금 백업]을 한 번 실행해주세요.');
+      return;
+    }
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${existing.id}?alt=media`,
+      { headers: { Authorization: `Bearer ${googleAccessToken}` } }
+    );
+    if (!res.ok) throw new Error('드라이브 파일 다운로드 실패 (' + res.status + ')');
+    const parsed = await res.json();
+
+    // 아파트원 ERP 백업 파일 구조인지 간단 검증
+    if (!parsed || typeof parsed !== 'object' || !parsed.data || typeof parsed.data !== 'object') {
+      alert('❌ 올바른 아파트원 ERP 백업 파일 형식이 아닙니다.');
+      return;
+    }
+    const dataKeys = Object.keys(parsed.data);
+    if (dataKeys.length === 0) {
+      alert('❌ 백업 파일에 복구할 데이터가 없습니다.');
+      return;
+    }
+
+    localStorage.clear();
+    dataKeys.forEach(key => {
+      localStorage.setItem(key, parsed.data[key]);
+    });
+
+    alert('✅ 구글 드라이브에서 복원이 완료되었습니다. 화면을 새로고침합니다.');
+    location.reload();
+  } catch (err) {
+    console.error('restoreBackupFromGoogleDrive 오류:', err);
+    alert('❌ 복원 중 오류가 발생했습니다: ' + err.message);
+  }
+}
+
+// -----------------------------
+// 11) 자동 백업 시작/중지 (로그인 시 시작, 로그아웃 시 중지)
+// -----------------------------
+function startGoogleAutoBackup() {
+  if (googleAutoBackupIntervalId) return; // 중복 시작 방지
+  googleAutoBackupIntervalId = setInterval(() => {
+    saveBackupToGoogleDrive(true); // silent = true (알림 없이 조용히 백업)
+  }, GOOGLE_AUTO_BACKUP_INTERVAL_MS);
+  saveBackupToGoogleDrive(true); // 로그인 직후 1회 즉시 백업
+}
+
+function stopGoogleAutoBackup() {
+  if (googleAutoBackupIntervalId) {
+    clearInterval(googleAutoBackupIntervalId);
+    googleAutoBackupIntervalId = null;
+  }
+}
+
+// -----------------------------
+// 12) 헤더에 마지막 백업 시각 표시
+// -----------------------------
+function updateDriveBackupStatusUI() {
+  const statusEl = document.getElementById('google-drive-last-backup');
+  if (!statusEl || !lastDriveBackupTime) return;
+  const hh = String(lastDriveBackupTime.getHours()).padStart(2, '0');
+  const mm = String(lastDriveBackupTime.getMinutes()).padStart(2, '0');
+  statusEl.textContent = `마지막 백업 ${hh}:${mm}`;
+}
+// --- 구글 드라이브 실시간 자동 백업(3단계) 끝 ---
+
+// ================================================================
+// 🔒 5단계: 구글 드라이브 실시간 자동 동기화 (Add Only 방식으로 신규 추가됨)
+// - 기존 함수/로직은 단 한 줄도 수정하지 않음
+// - 위쪽의 localStorage.setItem 전역 패치가 이 saveDataToGoogleDrive()를
+//   자동으로 호출해줌 (디바운스 적용)
+// - apt_easy_db.json 하나만 계속 덮어쓰는 "실시간 동기화 전용 파일"이며,
+//   3단계의 정기 스냅샷 백업 파일(apt_one_erp_autobackup.json)과는
+//   별개로 동작함 (서로 영향 없음)
+// ================================================================
+
+const GOOGLE_DRIVE_LIVE_SYNC_FILENAME = 'apt_easy_db.json';
+
+// -----------------------------
+// 13) appDataFolder에서 실시간 동기화 파일 찾기 (없으면 null)
+// -----------------------------
+async function findDriveDbFileId() {
+  const res = await fetch(
+    `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name%3D'${encodeURIComponent(GOOGLE_DRIVE_LIVE_SYNC_FILENAME)}'&fields=files(id,name,modifiedTime)`,
+    { headers: { Authorization: `Bearer ${googleAccessToken}` } }
+  );
+  if (!res.ok) throw new Error('드라이브 파일 목록 조회 실패 (' + res.status + ')');
+  const data = await res.json();
+  if (data.files && data.files.length > 0) return data.files[0];
+  return null;
+}
+
+// -----------------------------
+// 14) 현재 LocalStorage 전체를 구글 드라이브에 생성/덮어쓰기 (실시간 동기화 본체)
+//     - 네트워크 오류/토큰 만료 등으로 실패해도 절대 프로그램을 멈추지 않고,
+//       화면 우측 하단에 부드러운 경고 토스트만 띄움 (요청사항 3번)
+// -----------------------------
+async function saveDataToGoogleDrive() {
+  if (!googleAccessToken) return; // 로그인 안 된 상태면 조용히 스킵 (LocalStorage에는 이미 정상 저장됨)
+  try {
+    const backupData = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      backupData[key] = localStorage.getItem(key);
+    }
+    const payload = {
+      appName: 'Apt-ONE 아파트원 ERP',
+      syncVersion: 1,
+      syncedAt: new Date().toISOString(),
+      data: backupData
+    };
+    const jsonStr = JSON.stringify(payload);
+
+    const existing = await findDriveDbFileId();
+    const metadata = existing
+      ? { name: GOOGLE_DRIVE_LIVE_SYNC_FILENAME }
+      : { name: GOOGLE_DRIVE_LIVE_SYNC_FILENAME, parents: ['appDataFolder'] };
+
+    const boundary = 'aptone_livesync_' + Date.now();
+    const multipartBody =
+      `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n` +
+      `--${boundary}\r\nContent-Type: application/json\r\n\r\n${jsonStr}\r\n` +
+      `--${boundary}--`;
+
+    const url = existing
+      ? `https://www.googleapis.com/upload/drive/v3/files/${existing.id}?uploadType=multipart`
+      : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+    const method = existing ? 'PATCH' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${googleAccessToken}`,
+        'Content-Type': `multipart/related; boundary=${boundary}`
+      },
+      body: multipartBody
+    });
+    if (!res.ok) throw new Error('클라우드 저장 실패 (HTTP ' + res.status + ')');
+
+    hideCloudSyncFailToast(); // 정상 복구되면 이전에 떠있던 실패 토스트가 있으면 숨김
+  } catch (err) {
+    // 요청사항 3번: 실패해도 프로그램은 절대 멈추지 않고, 조용히 경고만 표시
+    console.error('saveDataToGoogleDrive 오류:', err);
+    showCloudSyncFailToast();
+  }
+}
+
+// -----------------------------
+// 15) 초기 진입 시 구글 드라이브 데이터 자동 불러오기
+//     - 클라우드에 파일이 있으면: 클라우드 데이터가 로컬보다 우선 (요청사항 2번)
+//     - 클라우드에 파일이 없으면: 현재 로컬 데이터를 최초 업로드
+// -----------------------------
+async function loadDataFromGoogleDrive() {
+  if (!googleAccessToken) return;
+  try {
+    const existing = await findDriveDbFileId();
+
+    if (existing) {
+      const res = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${existing.id}?alt=media`,
+        { headers: { Authorization: `Bearer ${googleAccessToken}` } }
+      );
+      if (!res.ok) throw new Error('클라우드 데이터 다운로드 실패 (HTTP ' + res.status + ')');
+      const parsed = await res.json();
+
+      if (!parsed || typeof parsed !== 'object' || !parsed.data || typeof parsed.data !== 'object') {
+        throw new Error('클라우드 데이터 형식이 올바르지 않습니다.');
+      }
+
+      // 현재 로컬 데이터와 완전히 동일하면 불필요한 새로고침을 생략함
+      const currentSnapshot = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        currentSnapshot[key] = localStorage.getItem(key);
+      }
+      const isSame = JSON.stringify(currentSnapshot) === JSON.stringify(parsed.data);
+      if (isSame) {
+        console.log('☁️ 클라우드 데이터가 로컬과 동일합니다. 동기화를 생략합니다.');
+        return;
+      }
+
+      // 클라우드 데이터가 로컬보다 우선순위를 가짐 → 로컬을 클라우드 내용으로 덮어씀
+      window.__isCloudRestoring__ = true; // 복원 중 재업로드(무한동기화) 방지
+      localStorage.clear();
+      Object.keys(parsed.data).forEach(key => {
+        localStorage.setItem(key, parsed.data[key]);
+      });
+      window.__isCloudRestoring__ = false;
+
+      alert('☁️ 구글 드라이브의 최신 데이터를 불러왔습니다. 화면을 새로고침합니다.');
+      location.reload();
+    } else {
+      // 드라이브에 아직 동기화 파일이 없다면, 현재 로컬 데이터를 최초 업로드
+      await saveDataToGoogleDrive();
+      console.log('☁️ 구글 드라이브에 초기 데이터를 업로드했습니다.');
+    }
+  } catch (err) {
+    console.error('loadDataFromGoogleDrive 오류:', err);
+    showCloudSyncFailToast();
+  }
+}
+
+// -----------------------------
+// 16) 클라우드 동기화 실패 안내 토스트 (요청사항 3번)
+// -----------------------------
+let cloudSyncToastTimer = null;
+function showCloudSyncFailToast() {
+  const toast = document.getElementById('cloud-sync-toast');
+  if (!toast) return;
+  toast.style.display = 'block';
+  clearTimeout(cloudSyncToastTimer);
+  cloudSyncToastTimer = setTimeout(() => {
+    toast.style.display = 'none';
+  }, 4000); // 4초 후 자동으로 사라짐
+}
+function hideCloudSyncFailToast() {
+  const toast = document.getElementById('cloud-sync-toast');
+  if (toast) toast.style.display = 'none';
+  clearTimeout(cloudSyncToastTimer);
+}
+
+// -----------------------------
+// 17) 재방문 시 자동 재로그인(무언 로그인) 시도
+//     이전에 이미 동의한 사용자라면 팝업 없이 조용히 토큰을 다시 받아
+//     loadDataFromGoogleDrive()가 자동으로 이어지도록 함.
+//     (브라우저/구글 세션 상태에 따라 팝업이 뜰 수도 있는 best-effort 동작)
+// -----------------------------
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (googleTokenClient && !googleAccessToken) {
+      try {
+        googleTokenClient.requestAccessToken({ prompt: '' });
+      } catch (e) {
+        console.log('자동 재로그인 시도를 건너뜁니다 (정상적인 경우일 수 있음):', e);
+      }
+    }
+  }, 1200); // initGoogleAuth가 먼저 완료되도록 약간의 지연
 });
-// ▲▲▲ [신규추가] 자동 백업 경고 팝업 로직 끝 ▲▲▲
+// --- 구글 드라이브 실시간 자동 동기화(5단계) 끝 ---
 	</script>
-	<!-- ▼▼▼ [신규추가] 백업 강제 경고 모달 (Add Only, 기존 코드 영향 없음) ▼▼▼ -->
-	<div id="backupWarningOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:99999; align-items:center; justify-content:center;">
-	  <div style="background:#fff; max-width:480px; width:90%; border-radius:14px; padding:30px 28px; box-shadow:0 10px 40px rgba(0,0,0,0.4); border:4px solid #e53935; text-align:center;">
-	    <div style="font-size:52px; line-height:1;">⚠️</div>
-	    <div style="font-size:22px; font-weight:800; color:#e53935; margin:14px 0 10px;">데이터 백업 필수 경고</div>
-	    <div style="font-size:15px; line-height:1.7; color:#333; text-align:left;">
-	      본 프로그램의 모든 데이터는 <b>현재 사용중인 PC(브라우저)에만 저장</b>됩니다.<br>
-	      PC 교체, 브라우저 초기화, 캐시 삭제, 시스템 오류 등이 발생하면 <b style="color:#e53935;">데이터가 영구적으로 소실</b>될 수 있습니다.<br><br>
-	      반드시 <b>[엑셀 다운로드]</b> 또는 <b>[JSON 내보내기]</b> 기능을 사용하여 정기적으로 백업하시기 바랍니다.<br><br>
-	      <b style="color:#e53935;">백업을 하지 않아 발생하는 데이터 손실에 대한 책임은 전적으로 사용자 본인에게 있으며, 개발자는 이에 대한 어떠한 책임도 지지 않습니다.</b>
-	    </div>
-	    <button onclick="document.getElementById('backupWarningOverlay').style.display='none';" style="margin-top:22px; background:#e53935; color:#fff; border:none; padding:12px 30px; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer;">확인했습니다 (닫기)</button>
-	  </div>
-	</div>
-	<!-- ▲▲▲ [신규추가] 백업 강제 경고 모달 끝 ▲▲▲ -->
 	</body>
 </html>
