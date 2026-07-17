@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>아파트관리업무(APT-EASY)ERP V49.BETA</title>
+<title>아파트관리업무(APT-EASY)ERP V50.BETA</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <!-- ============================================================ -->
@@ -725,7 +725,7 @@ tbody tr:last-child td { border-bottom: none; }
 
 <div class="header no-print">
   <div class="header-left">
-    <h1>🏢아파트관리업무(APT-EASY)ERP V49.BETA</h1>
+    <h1>🏢아파트관리업무(APT-EASY)ERP V50.BETA</h1>
     <p>환경설정에서 요금부과설정 수정이 가능합니다</p>
   </div>
   <div class="header-right">
@@ -1083,6 +1083,7 @@ tbody tr:last-child td { border-bottom: none; }
                   <input type="file" id="civ-file" accept="image/*" style="font-size:12px; flex:1;">
                   <div id="civ-preview-container" style="display:none;"><img id="civ-preview" style="height:30px; border-radius:4px; border:1px solid var(--border);"></div>
                 </div>
+                <div id="civ-photo-info" style="font-size:11px; color:var(--text2); margin-top:4px;">사진은 저장 공간 절약을 위해 자동으로 축소·압축됩니다.</div>
               </div>
             </div>
             <div style="margin-top:15px; display:flex; gap:10px;">
@@ -1327,7 +1328,7 @@ tbody tr:last-child td { border-bottom: none; }
                   <div class="card-title" style="font-size:15px;">📋 법정점검 상세 내역</div>
                   <div style="display:flex; gap:8px;">
                     <input type="text" id="legal-search" placeholder="점검명, 업체 검색..." onkeyup="searchInspection()" style="padding:5px 10px; border:1px solid var(--border); border-radius:4px; font-size:12px; width:200px;">
-                    <button class="btn btn-blue btn-sm" onclick="exportInspectionExcel()">Excel</button>
+                    <button class="btn btn-blue btn-sm" onclick="exportLegalInspectionExcel()">Excel</button>
                     <button class="btn btn-outline btn-sm" onclick="printInspection()">인쇄</button>
                     <button class="btn btn-primary btn-sm" onclick="openLegalModal()">➕ 점검 등록</button>
                   </div>
@@ -1502,15 +1503,14 @@ tbody tr:last-child td { border-bottom: none; }
     <div id="page-dash" class="page active">
       <div id="dash-stat-grid" class="stat-grid"></div>
       <div class="card">
-        <div class="card-header"><div class="card-title">✨ v49 업데이트 안내</div></div>
+        <div class="card-header"><div class="card-title">✨ v50 업데이트 안내</div></div>
         <div style="line-height:1.8">
-          <p>• <b>버그 수정 (v49):</b> 아래 항목들이 수정되었습니다.</p>
-          <p>• <b>동 드롭다운 동기화:</b> 환경설정에서 동 수 변경 시 모든 동 선택 드롭다운이 즉시 갱신됩니다.</p>
-          <p>• <b>전체 세대 자동생성:</b> 648세대 고정이 아닌 환경설정의 <b>동 수 / 세대 수</b>를 기반으로 동적 생성됩니다.</p>
-          <p>• <b>호수 정렬 오류 수정:</b> 조회/고지서 출력에서 호수가 문자순(201 &lt; 99) 대신 숫자순(99 &lt; 201)으로 올바르게 정렬됩니다.</p>
-          <p>• <b>항목 선택 필터 적용:</b> 부과 통합 조회에서 '헬스장/주차/사물함' 항목 선택이 실제 조회 결과에 반영됩니다.</p>
-          <p>• <b>해지 관리 페이지 스타일 수정:</b> 헬스장/주차/사물함 해지 관리 페이지 헤더가 정상 표시됩니다.</p>
-          <p>• <b>세대 DB 드롭다운 누락 수정:</b> 초기 로드 시 세대 DB 필터 드롭다운도 올바르게 초기화됩니다.</p>
+          <p>• <b>⚠️ 데이터 유실 문제 해결 (가장 중요):</b> 이전 버전은 접속할 때마다 구글 드라이브의 내용이 이 컴퓨터의 내용을 <b>무조건 덮어써서</b>, 인터넷이 끊긴 상태에서 입력한 자료가 사라질 수 있었습니다. 이제는 <b>어느 쪽이 최신인지 비교</b>한 뒤, 덮어써야 할 상황에서만 양쪽 수정 시각을 보여드리고 <b>확인을 받습니다.</b> 덮어쓰기 직전에는 현재 자료를 백업 파일로 자동 저장합니다.</p>
+          <p>• <b>사진 자동 압축:</b> 민원 사진을 첨부하면 자동으로 크기를 줄여 저장합니다. 저장 공간이 가득 차서 <b>저장이 조용히 실패하던 문제</b>도 해결했습니다. 이제 공간이 부족하면 명확히 알려드립니다. ([설정] → 저장 공간 관리)</p>
+          <p>• <b>동명이인 오작동 수정:</b> 같은 세대에 이름이 같은 구성원이 있거나 이름이 비어 있으면 <b>엉뚱한 사람이 수정·삭제될 수 있었습니다.</b> 이제 세대DB의 모든 구성원에게 고유 번호를 부여해 정확히 한 명만 처리합니다. (기존 자료는 자동으로 번호가 부여됩니다)</p>
+          <p>• <b>시설점검 [수정] 버튼 무반응 해결:</b> 시설점검과 법정점검의 내부 함수 이름이 겹쳐 시설점검 수정이 동작하지 않던 문제를 고쳤습니다.</p>
+          <p>• <b>반쪽 백업 제거:</b> 기존 '데이터 내보내기(JSON)'는 헬스장·주차·사물함·세대DB·설정만 저장하고 <b>업무일정·체납·점검·민원·재고·법정점검·자산은 빠뜨렸습니다.</b> 이제 [전체 데이터 백업] 하나로 모든 자료를 저장합니다.</p>
+          <p>• <b>보안 정리:</b> 소스에 그대로 적혀 있던 설정 비밀번호를 제거했고, 입주민 성명·메모가 화면을 깨뜨리지 않도록 처리했습니다.</p>
           <p>• <b>데이터삭제주의:</b> PC를 교체하거나 브라우저 초기화시 '데이터 내보내기(JSON)', '데이터 가져오기', '엑셀 파일 다운로드' 기능을 꼭 사용하십시오.</p>
         </div>
       </div>
@@ -1708,7 +1708,24 @@ tbody tr:last-child td { border-bottom: none; }
           <div class="form-group"><label>기본 대수</label><input type="number" id="s-park-base"></div>
           <div class="form-group"><label>추가 대수당</label><input type="number" id="s-park-add"></div>
           <div class="form-group"><label>사물함 이용료(개당)</label><input type="number" id="s-locker-fee"></div>
-          <div class="form-group"><label>부과 기준일</label><input type="number" id="s-cut-day" placeholder="20"></div>
+        </div>
+
+        <div class="card-header" style="margin-top:20px"><div class="card-title">📅 종목별 부과 기준일</div></div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:12px">
+          기준일까지 등록하면 <b>당월부터</b>, 기준일 다음 날부터 등록하면 <b>익월부터</b> 부과합니다.<br>
+          예) 기준일 <b>20</b> → 20일 등록 = 당월 부과 / 21일 등록 = 익월 부과<br>
+          기준일을 <b>31</b>로 두면 등록일과 관계없이 <b>항상 당월 부과</b>됩니다.
+        </div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label>🏋️ 헬스장 기준일</label><input type="number" id="s-gym-cut-day" min="1" max="31" placeholder="20" oninput="previewCutDay()"></div>
+          <div class="form-group"><label>🚗 주차 기준일</label><input type="number" id="s-park-cut-day" min="1" max="31" placeholder="31" oninput="previewCutDay()"></div>
+          <div class="form-group"><label>🔐 사물함 기준일</label><input type="number" id="s-locker-cut-day" min="1" max="31" placeholder="31" oninput="previewCutDay()"></div>
+        </div>
+        <div id="cut-day-preview" style="margin-top:10px"></div>
+        <div style="font-size:12px;color:var(--red);line-height:1.7;margin-top:12px;padding:10px;background:rgba(220,60,60,.07);border-radius:8px">
+          ⚠️ <b>주의:</b> 이 프로그램은 부과액을 저장해두지 않고 <b>조회할 때마다 등록일 기준으로 다시 계산</b>합니다.
+          따라서 기준일을 바꾸면 <b>이미 지나간 달의 부과 내역까지 함께 바뀝니다.</b>
+          변경 전 [전체 데이터 백업]을 받아두시고, 과거 고지서와 달라질 수 있다는 점을 감안해주세요.
         </div>
         <div class="form-grid form-grid-2" style="margin-top:15px">
           <div class="form-group"><label>입금 계좌</label><input type="text" id="s-bank"></div>
@@ -1721,9 +1738,31 @@ tbody tr:last-child td { border-bottom: none; }
         <div id="settings-summary" class="alert alert-info" style="margin-top:20px"></div>
       </div>
       <div class="card"><div class="card-header"><div class="card-title">📥 데이터 백업 및 복구</div></div>
-        <div style="display:flex;gap:10px;margin-top:15px">
-          <button class="btn btn-blue" onclick="exportBackup()">데이터 내보내기 (JSON)</button>
-          <label class="btn btn-outline" style="cursor:pointer">데이터 가져오기<input type="file" style="display:none" onchange="importBackup(event)"></label>
+        <!-- [v50] 기존 '데이터 내보내기(JSON)' 버튼은 헬스장/주차/사물함/세대DB/설정 5종만
+             백업하고 업무일정·체납·점검·민원·재고·법정점검·자산은 빠뜨렸기 때문에 제거했습니다.
+             아래 '전체 데이터 백업' 하나로 통일합니다. -->
+        <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap">
+          <button class="btn btn-blue" onclick="exportFullData()">💾 전체 데이터 백업 (.json)</button>
+          <label class="btn btn-outline" style="cursor:pointer">📂 백업 파일로 복구
+            <input type="file" accept=".json,application/json" style="display:none"
+              onchange="if(this.files && this.files[0]){ importFullData(this.files[0]); } this.value='';">
+          </label>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:10px;line-height:1.6">
+          ※ 이 백업 파일 하나에 <b>모든 업무 데이터가 전부</b> 들어갑니다. 매월 1회 이상 받아 별도 보관하세요.<br>
+          ※ 백업 파일에는 입주민 성명·전화번호가 들어 있습니다. 외부 유출되지 않도록 관리해주세요.
+        </div>
+      </div>
+
+      <div class="card"><div class="card-header"><div class="card-title">🗄️ 저장 공간 관리</div></div>
+        <div style="margin-top:15px" id="storage-meter"></div>
+        <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="compactStoredPhotos()">🗜️ 사진 용량 정리</button>
+          <button class="btn btn-outline" onclick="updateStorageMeter()">🔄 사용량 새로고침</button>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:10px;line-height:1.6">
+          ※ 브라우저 저장 공간은 약 5MB로 제한됩니다. 80%를 넘으면 저장이 실패할 수 있으니 정리해주세요.<br>
+          ※ 새로 첨부하는 사진은 자동으로 축소·압축되므로 별도 조치가 필요 없습니다.
         </div>
       </div>
     </div>
@@ -1764,14 +1803,62 @@ tbody tr:last-child td { border-bottom: none; }
 </div>
 
 <script>
-const KEYS = { GYM: 'apt_gym_v23', PARK: 'apt_park_v23', LOCKER: 'apt_locker_v23', DB: 'apt_db_v23', CFG: 'apt_cfg_v23', THEME: 'apt_theme_v23' };
-const SETTINGS_PW = '0217';
+// ================================================================
+// [v50 수정 5번] 저장소 키 단일 레지스트리
+//
+// ⚠️ 키 "문자열" 자체는 일부러 바꾸지 않았습니다.
+//    (예: 'apt_gym_v23'을 'apt_gym_v50'으로 바꾸면 기존 사용자의 데이터가
+//     전부 사라진 것처럼 보이게 되며, 이름만 예뻐질 뿐 실익이 없습니다.)
+//    대신 흩어져 있던 키 선언을 이 한 곳에 모아 "어디에 무엇이 저장되는지"를
+//    한눈에 볼 수 있게 했습니다. 아래 office_* 키들은 각 기능 섹션에서
+//    이 레지스트리를 참조합니다.
+// ================================================================
+const KEYS = {
+  // 이용료 관리 (구 v23 계열 — 문자열 유지)
+  GYM: 'apt_gym_v23', PARK: 'apt_park_v23', LOCKER: 'apt_locker_v23',
+  DB: 'apt_db_v23', CFG: 'apt_cfg_v23', THEME: 'apt_theme_v23',
+  // 관리업무센터 (office_* 계열 — 문자열 유지)
+  SCHED: 'office_schedule', ARR: 'office_arrears', INS: 'office_inspection',
+  CIV: 'office_civil', INV: 'office_inventory', AI: 'office_ai',
+  TPL: 'office_templates', LEGAL: 'office_legalInspection',
+  ASSET: 'office_assets', ASSET_LOG: 'office_asset_logs',
+  // 부속 정보
+  RECENT: 'apt_recent_v49', FAV: 'apt_fav_v49'
+};
+
+// ── [v50 수정 4번] 충돌하지 않는 고유 ID 생성기 ──────────────
+// v49는 Date.now()를 그대로 ID로 썼기 때문에 반복문 안에서 여러 건을 만들면
+// 같은 밀리초에 동일한 ID가 찍혀 서로를 덮어쓸 수 있었습니다.
+// 숫자형을 유지해야 기존 인라인 onclick 호출(따옴표 없는 숫자 인자)이 그대로 동작하므로,
+// "단조 증가" 방식으로 만듭니다. 직전에 발급한 값보다 반드시 큰 값을 돌려주므로
+// 한 밀리초에 몇 건을 만들든 절대 중복되지 않습니다.
+let __lastId = 0;
+function uid() {
+  let t = Date.now() * 1000;      // 최대 약 1.8e15 < MAX_SAFE_INTEGER(9.0e15)
+  if (t <= __lastId) t = __lastId + 1; // 같은 밀리초에 여러 건이 생겨도 항상 새 값
+  __lastId = t;
+  return t;
+}
+
+// ── [v50 수정 6번] HTML 이스케이프 ───────────────────────────
+// v49는 입주민 성명·메모 등을 innerHTML 템플릿에 그대로 꽂아 넣었습니다.
+// 이름에 < > " ' & 같은 글자가 들어가면 표가 깨지거나, 최악의 경우
+// 입력값이 코드로 실행됩니다. 화면에 찍는 모든 사용자 입력은 esc()를 거칩니다.
+function esc(v) {
+  if (v === null || v === undefined) return '';
+  return String(v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 let gymData = JSON.parse(localStorage.getItem(KEYS.GYM) || '[]');
 let parkData = JSON.parse(localStorage.getItem(KEYS.PARK) || '[]');
 let lockerData = JSON.parse(localStorage.getItem(KEYS.LOCKER) || '[]');
 let dbData = JSON.parse(localStorage.getItem(KEYS.DB) || '[]');
-let cfg = JSON.parse(localStorage.getItem(KEYS.CFG) || '{"gymFee":10000,"gymAdd":5000,"gymBase":2,"parkFee":30000,"parkAdd":50000,"parkBase":2,"lockerFee":3000,"cutDay":20,"bank":"농협 000-0000-0000-00","phone":"054-000-0000","buildings":8,"households":648}');
+let cfg = JSON.parse(localStorage.getItem(KEYS.CFG) || '{"gymFee":10000,"gymAdd":5000,"gymBase":2,"parkFee":30000,"parkAdd":50000,"parkBase":2,"lockerFee":3000,"cutDay":20,"gymCutDay":20,"parkCutDay":31,"lockerCutDay":31,"bank":"농협 000-0000-0000-00","phone":"054-000-0000","buildings":8,"households":648}');
 
 // 동 배열: cfg.buildings 기반으로 동적 생성 (101, 102, ..., 1xx)
 let DONGS = [];
@@ -1784,6 +1871,53 @@ function rebuildDongs() {
   const df = document.getElementById('db-dong-filter'); if(df) df.innerHTML = dongFilterOpts;
 }
 rebuildDongs();
+
+// ================================================================
+// [v50 수정 4번] 데이터 마이그레이션 — 세대DB에 고유 ID 부여
+//
+// v49의 dbData 레코드에는 id가 아예 없었고, 수정/삭제를 "동+호+이름" 조합으로
+// 찾았습니다. 그래서 (1) 같은 세대의 동명이인, (2) autoGenDB가 만든 이름 없는
+// 세대들이 서로 구분되지 않아 엉뚱한 레코드가 수정·삭제될 수 있었습니다.
+// 여기서 기존 레코드에 id를 한 번 채워 넣고, 이후로는 항상 id로 찾습니다.
+// 이 작업은 최초 1회만 실행되며, 원본 데이터는 아무것도 지우지 않습니다.
+// ================================================================
+function migrateData() {
+  let touched = false;
+
+  // 1) 세대DB: id 없는 레코드에 id 부여
+  dbData.forEach(r => {
+    if (r.id === undefined || r.id === null || r.id === '') { r.id = uid(); touched = true; }
+  });
+
+  // 2) 이용료 데이터: 혹시 id가 비어 있거나 중복된 레코드가 있으면 정리
+  [gymData, parkData, lockerData].forEach(arr => {
+    const seen = new Set();
+    arr.forEach(r => {
+      if (r.id === undefined || r.id === null || r.id === '' || seen.has(String(r.id))) {
+        r.id = String(uid()); touched = true;
+      }
+      seen.add(String(r.id));
+    });
+  });
+
+  // 3) 종목별 부과 기준일: 기존 동작을 그대로 보존하는 값으로 채운다
+  //    헬스장 = 기존 cutDay 그대로 / 주차·사물함 = 31(= 등록일 무관 당월 부과, v49와 동일)
+  if (cfg.gymCutDay === undefined || cfg.gymCutDay === null) {
+    const old = parseInt(cfg.cutDay, 10);
+    cfg.gymCutDay = Number.isFinite(old) ? old : 20; touched = true;
+  }
+  if (cfg.parkCutDay === undefined || cfg.parkCutDay === null)   { cfg.parkCutDay = 31; touched = true; }
+  if (cfg.lockerCutDay === undefined || cfg.lockerCutDay === null) { cfg.lockerCutDay = 31; touched = true; }
+
+  if (touched) {
+    try {
+      save();
+      console.log('✅ [v50] 데이터 마이그레이션 완료: 고유 ID·종목별 부과기준일을 설정했습니다.');
+    } catch (e) {
+      console.error('마이그레이션 저장 실패:', e);
+    }
+  }
+}
 
 function save() {
   localStorage.setItem(KEYS.GYM, JSON.stringify(gymData));
@@ -1831,23 +1965,107 @@ function openSettingsAuth() {
   document.getElementById('pw-input').focus();
 }
 function closeSettingsAuth() { document.getElementById('pw-modal-overlay').style.display = 'none'; }
-function confirmSettingsPw() {
-  if (document.getElementById('pw-input').value === SETTINGS_PW) {
+// ================================================================
+// [v50 수정 6번] 환경설정 잠금 비밀번호
+//
+// v49에는 `const SETTINGS_PW = '0217';` 이 소스에 평문으로 박혀 있어
+// 소스보기 한 번이면 그대로 노출됐습니다. 여기서는 SHA-256 해시만 담습니다.
+//
+// ⚠️ 솔직히 짚어둘 점:
+//    브라우저에서만 도는 프로그램인 이상, 해시로 바꿔도 "보안"이 되지는 않습니다.
+//    개발자도구로 함수를 직접 호출하면 얼마든지 우회됩니다.
+//    이것은 어디까지나 "다른 직원이 실수로 설정을 건드리는 것을 막는 잠금"이며,
+//    외부인 접근 차단 수단이 아니라는 점을 전제로 사용해주세요.
+//    (진짜 접근통제가 필요하면 서버 인증이 필요합니다 — 아래 안내 참조)
+// ================================================================
+// 현재 비밀번호는 기존과 동일한 0217 입니다. 아래는 그 해시값입니다.
+const SETTINGS_PW_HASH     = '737513f7afb8668a9c9a489db2c4812419ad909bbc7d1989611852d8535909e7'; // SHA-256
+const SETTINGS_PW_HASH_ALT = '547ef78f'; // crypto.subtle을 못 쓰는 환경용 폴백(FNV-1a)
+
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+function fnv1aHex(s) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16).padStart(8, '0');
+}
+
+// 비밀번호 변경용 도우미:
+// 브라우저 개발자도구(F12) 콘솔에서  await makePwHash('새비밀번호')  를 실행하면
+// 아래 두 상수에 넣을 값이 출력됩니다. 그 값으로 교체하면 비밀번호가 바뀝니다.
+async function makePwHash(pw) {
+  const out = { SETTINGS_PW_HASH: await sha256Hex(String(pw)), SETTINGS_PW_HASH_ALT: fnv1aHex(String(pw)) };
+  console.log(out);
+  return out;
+}
+
+async function confirmSettingsPw() {
+  const input = document.getElementById('pw-input').value;
+  let ok = false;
+  try {
+    if (window.crypto && window.crypto.subtle) {
+      ok = (await sha256Hex(input)) === SETTINGS_PW_HASH;
+    } else {
+      // crypto.subtle은 보안 컨텍스트(https/localhost/file)에서만 제공됩니다.
+      // 사내 http 주소 등에서 열었을 때를 대비한 폴백입니다.
+      ok = fnv1aHex(input) === SETTINGS_PW_HASH_ALT;
+    }
+  } catch (e) {
+    console.error('비밀번호 확인 실패, 폴백 사용:', e);
+    ok = fnv1aHex(input) === SETTINGS_PW_HASH_ALT;
+  }
+
+  if (ok) {
+    document.getElementById('pw-error').style.display = 'none';
+    document.getElementById('pw-input').value = '';
     closeSettingsAuth(); showPage('settings'); loadSettings();
   } else {
     document.getElementById('pw-error').style.display = 'block';
   }
 }
 
-function isActive(item, ym, isGym = false) {
+// ================================================================
+// [v50] 종목별 부과 기준일
+//
+// 규칙: "등록일이 기준일보다 크면 다음 달부터 부과"
+//   · 기준일 20 → 20일까지 등록하면 당월 부과, 21일부터는 익월 부과
+//   · 기준일 31 → 등록일과 무관하게 항상 당월 부과 (31일보다 큰 날짜는 없으므로)
+//
+// ⚠️ 기본값에 대하여 (중요)
+//   v49는 cutDay를 헬스장에만 적용하고, 주차·사물함은 등록 당일부터 무조건
+//   당월 부과했습니다. 그래서 주차·사물함의 기본값을 31로 둡니다.
+//   이렇게 해야 v50으로 올려도 기존 부과 내역이 단 1원도 바뀌지 않습니다.
+//   관리규약에 맞게 바꾸실 때만 환경설정에서 직접 조정하세요.
+// ================================================================
+function getCutDay(type) {
+  const raw = type === 'gym'    ? cfg.gymCutDay
+            : type === 'park'   ? cfg.parkCutDay
+            : type === 'locker' ? cfg.lockerCutDay
+            : undefined;
+  const n = parseInt(raw, 10);
+  if (Number.isFinite(n) && n >= 1 && n <= 31) return n;
+  // 설정값이 없으면 v49와 동일하게 동작 (헬스장만 cutDay 적용)
+  if (type === 'gym') { const old = parseInt(cfg.cutDay, 10); return Number.isFinite(old) ? old : 20; }
+  return 31;
+}
+
+// type: 'gym' | 'park' | 'locker'
+function isActive(item, ym, type) {
+  if (type === true) type = 'gym';   // 구버전 호출(isActive(r, ym, 'gym')) 호환
   const startYm = item.date.slice(0, 7);
-  if (isGym) {
-    const d = parseInt(item.date.slice(8, 10));
-    let sYm = startYm; if (d > cfg.cutDay) {
-      let [y, m] = startYm.split('-').map(Number); m++; if (m > 12) { m = 1; y++; } sYm = `${y}-${String(m).padStart(2, '0')}`;
-    }
-    if (ym < sYm) return false;
-  } else { if (ym < startYm) return false; }
+  let sYm = startYm;
+
+  const d = parseInt(item.date.slice(8, 10), 10);
+  if (Number.isFinite(d) && d > getCutDay(type)) {
+    let [y, m] = startYm.split('-').map(Number); m++; if (m > 12) { m = 1; y++; }
+    sYm = `${y}-${String(m).padStart(2, '0')}`;
+  }
+  if (ym < sYm) return false;
+
+  // ── 해지 부분은 의도적으로 v49 그대로 둡니다 ──
+  // (해지일이 속한 달까지 전액 부과. 사용자께서 별도로 재확인 예정)
   if (!item.cancelDate) return true;
   return ym <= item.cancelDate.slice(0, 7);
 }
@@ -1897,11 +2115,11 @@ function renderList(type) {
   let head = `<thead><tr><th>동</th><th>호수</th><th>성명</th><th>회원번호</th><th>전화번호</th>${type === 'park' ? '<th>차량번호</th>' : ''}<th>등록일</th><th>해지일</th><th>관리</th></tr></thead>`;
   el.innerHTML = `<div class="tbl-wrap"><table>${head}<tbody>` +
     filtered.map(r => `<tr class="${r.cancelDate ? 'cancelled-row' : ''}">
-      <td>${r.dong}동</td><td>${r.ho}호</td>
-      <td>${r.name} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-field="name" onclick="editField(this)">수정</button></td>
-      <td>${r.member || '-'}</td>
-      <td>${r.phone || '-'} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-field="phone" onclick="editField(this)">수정</button></td>
-      ${type === 'park' ? `<td>${r.carnum || '-'}</td>` : ''}
+      <td>${esc(r.dong)}동</td><td>${esc(r.ho)}호</td>
+      <td>${esc(r.name)} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-field="name" onclick="editField(this)">수정</button></td>
+      <td>${esc(r.member || '-')}</td>
+      <td>${esc(r.phone || '-')} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-field="phone" onclick="editField(this)">수정</button></td>
+      ${type === 'park' ? `<td>${esc(r.carnum || '-')}</td>` : ''}
       <td>${r.date} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-datetype="reg" onclick="editDateFromBtn(this)">수정</button></td>
       <td>${r.cancelDate || '-'} <button class="btn btn-outline btn-sm no-print" data-type="${type}" data-id="${r.id}" data-datetype="can" onclick="editDateFromBtn(this)">수정</button></td>
       <td><button class="btn btn-red btn-sm no-print" data-type="${type}" data-id="${r.id}" onclick="cancelItemFromBtn(this)">해지</button> <button class="btn btn-red btn-sm no-print" data-type="${type}" data-id="${r.id}" onclick="deleteItemFromBtn(this)">삭제</button></td>
@@ -1993,7 +2211,7 @@ function renderCancelList(type) {
   });
   if (!filtered.length) { el.innerHTML = '<p class="tbl-empty">해지된 내역이 없습니다.</p>'; return; }
   el.innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>동</th><th>호수</th><th>성명</th><th>해지일</th><th>관리</th></tr></thead><tbody>` +
-    filtered.map(r => `<tr><td>${r.dong}동</td><td>${r.ho}호</td><td>${r.name}</td><td>${r.cancelDate}</td><td><button class="btn btn-outline btn-sm" onclick="restoreItem('${type}','${r.id}')">해지취소</button></td></tr>`).join('') + `</tbody></table></div>`;
+    filtered.map(r => `<tr><td>${esc(r.dong)}동</td><td>${esc(r.ho)}호</td><td>${esc(r.name)}</td><td>${r.cancelDate}</td><td><button class="btn btn-outline btn-sm" onclick="restoreItem('${type}','${r.id}')">해지취소</button></td></tr>`).join('') + `</tbody></table></div>`;
 }
 
 function restoreItem(type, id) {
@@ -2008,9 +2226,9 @@ function runIntegratedQuery() {
   const h = document.getElementById('q-ho').value.trim();
   const typeFilter = document.getElementById('q-type').value; // 'gym'|'park'|'locker'|''
   if (!ym) { alert('연월을 선택하세요.'); return; }
-  const gyms   = typeFilter && typeFilter !== 'gym'    ? [] : gymData.filter(r => isActive(r, ym, true) && (!d || r.dong === d) && (!h || r.ho === h));
-  const parks  = typeFilter && typeFilter !== 'park'   ? [] : parkData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h));
-  const lockers= typeFilter && typeFilter !== 'locker' ? [] : lockerData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h));
+  const gyms   = typeFilter && typeFilter !== 'gym'    ? [] : gymData.filter(r => isActive(r, ym, 'gym') && (!d || r.dong === d) && (!h || r.ho === h));
+  const parks  = typeFilter && typeFilter !== 'park'   ? [] : parkData.filter(r => isActive(r, ym, 'park') && (!d || r.dong === d) && (!h || r.ho === h));
+  const lockers= typeFilter && typeFilter !== 'locker' ? [] : lockerData.filter(r => isActive(r, ym, 'locker') && (!d || r.dong === d) && (!h || r.ho === h));
   const house = {};
   gyms.forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].gc++; house[k].members.push({ type: '헬스장', name: r.name, member: r.member, phone: r.phone, id: r.id }); });
   parks.forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].pc++; house[k].members.push({ type: '주차', name: r.name, member: r.member, phone: r.phone, id: r.id, carnum: r.carnum }); });
@@ -2033,13 +2251,13 @@ function runIntegratedQuery() {
       const rowspan = v.members.length || 1;
       const houseTotal = (v.g + v.p + v.l).toLocaleString();
       if (!v.members.length) {
-        return `<tr><td><button class="btn btn-red btn-sm no-print" data-dong="${v.dong}" data-ho="${v.ho}" data-ym="${ym}" onclick="deleteHouseholdFromBtn(this)">삭제</button></td><td>${v.dong}동</td><td>${v.ho}호</td><td>-</td><td>-</td><td>-</td><td>-</td><td>${v.g.toLocaleString()}</td><td>${v.p.toLocaleString()}</td><td>${v.l.toLocaleString()}</td><td><b>${houseTotal}</b></td></tr>`;
+        return `<tr><td><button class="btn btn-red btn-sm no-print" data-dong="${esc(v.dong)}" data-ho="${esc(v.ho)}" data-ym="${ym}" onclick="deleteHouseholdFromBtn(this)">삭제</button></td><td>${esc(v.dong)}동</td><td>${esc(v.ho)}호</td><td>-</td><td>-</td><td>-</td><td>-</td><td>${v.g.toLocaleString()}</td><td>${v.p.toLocaleString()}</td><td>${v.l.toLocaleString()}</td><td><b>${houseTotal}</b></td></tr>`;
       }
       return v.members.map((m, idx) => {
         if (idx === 0) {
-          return `<tr><td rowspan="${rowspan}"><button class="btn btn-red btn-sm no-print" data-dong="${v.dong}" data-ho="${v.ho}" data-ym="${ym}" onclick="deleteHouseholdFromBtn(this)">세대 전체삭제</button></td><td rowspan="${rowspan}">${v.dong}동</td><td rowspan="${rowspan}">${v.ho}호</td><td>${m.type}</td><td>${m.name}${m.carnum ? ' (' + m.carnum + ')' : ''}</td><td>${m.member || '-'}</td><td>${m.phone || '-'}</td><td rowspan="${rowspan}">${v.g.toLocaleString()}</td><td rowspan="${rowspan}">${v.p.toLocaleString()}</td><td rowspan="${rowspan}">${v.l.toLocaleString()}</td><td rowspan="${rowspan}"><b>${houseTotal}</b></td></tr>`;
+          return `<tr><td rowspan="${rowspan}"><button class="btn btn-red btn-sm no-print" data-dong="${esc(v.dong)}" data-ho="${esc(v.ho)}" data-ym="${ym}" onclick="deleteHouseholdFromBtn(this)">세대 전체삭제</button></td><td rowspan="${rowspan}">${esc(v.dong)}동</td><td rowspan="${rowspan}">${esc(v.ho)}호</td><td>${esc(m.type)}</td><td>${esc(m.name)}${m.carnum ? ' (' + esc(m.carnum) + ')' : ''}</td><td>${esc(m.member || '-')}</td><td>${esc(m.phone || '-')}</td><td rowspan="${rowspan}">${v.g.toLocaleString()}</td><td rowspan="${rowspan}">${v.p.toLocaleString()}</td><td rowspan="${rowspan}">${v.l.toLocaleString()}</td><td rowspan="${rowspan}"><b>${houseTotal}</b></td></tr>`;
         }
-        return `<tr><td>${m.type}</td><td>${m.name}${m.carnum ? ' (' + m.carnum + ')' : ''}</td><td>${m.member || '-'}</td><td>${m.phone || '-'}</td></tr>`;
+        return `<tr><td>${esc(m.type)}</td><td>${esc(m.name)}${m.carnum ? ' (' + esc(m.carnum) + ')' : ''}</td><td>${esc(m.member || '-')}</td><td>${esc(m.phone || '-')}</td></tr>`;
       }).join('');
     }).join('') + `</tbody></table></div></div>`;
   document.getElementById('query-result').innerHTML = html;
@@ -2066,22 +2284,22 @@ function generateBills() {
   const h = document.getElementById('b-ho').value.trim();
   if (!ym) { alert('연월을 선택하세요.'); return; }
   const house = {};
-  gymData.filter(r => isActive(r, ym, true) && (!d || r.dong === d) && (!h || r.ho === h)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, name: r.name, gc: 0, pc: 0, lc: 0 }; house[k].gc++; });
-  parkData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, name: r.name, gc: 0, pc: 0, lc: 0 }; house[k].pc++; });
-  lockerData.filter(r => isActive(r, ym) && (!d || r.dong === d) && (!h || r.ho === h)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, name: r.name, gc: 0, pc: 0, lc: 0 }; house[k].lc++; });
+  gymData.filter(r => isActive(r, ym, 'gym') && (!d || r.dong === d) && (!h || r.ho === h)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, name: r.name, gc: 0, pc: 0, lc: 0 }; house[k].gc++; });
+  parkData.filter(r => isActive(r, ym, 'park') && (!d || r.dong === d) && (!h || r.ho === h)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, name: r.name, gc: 0, pc: 0, lc: 0 }; house[k].pc++; });
+  lockerData.filter(r => isActive(r, ym, 'locker') && (!d || r.dong === d) && (!h || r.ho === h)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, name: r.name, gc: 0, pc: 0, lc: 0 }; house[k].lc++; });
   let html = '';
   Object.values(house).sort((a, b) => a.dong === b.dong ? ((parseInt(a.ho)||0) - (parseInt(b.ho)||0)) : a.dong.localeCompare(b.dong)).forEach(v => {
     const gFee = v.gc <= cfg.gymBase ? (v.gc > 0 ? cfg.gymFee : 0) : cfg.gymFee + (v.gc - cfg.gymBase) * cfg.gymAdd;
     const pFee = v.pc <= cfg.parkBase ? (v.pc > 0 ? cfg.parkFee : 0) : cfg.parkFee + (v.pc - cfg.parkBase) * cfg.parkAdd;
     const lFee = v.lc * cfg.lockerFee;
     html += `<div class="card" style="max-width:600px;margin:0 auto 30px;padding:30px;border:2px solid #ccc; background:#fff; color:#000"><div style="text-align:center;border-bottom:2px solid #1a7a5e;padding-bottom:10px;margin-bottom:20px"><h2 style="color:#1a7a5e">아파트 시설 이용료 부과 고지서</h2><p>${ym} 부과분</p></div>
-      <p style="margin-bottom:10px">🏠 세대: <b>${v.dong}동 ${v.ho}호</b> (${v.name} 귀하)</p>
+      <p style="margin-bottom:10px">🏠 세대: <b>${esc(v.dong)}동 ${esc(v.ho)}호</b> (${esc(v.name)} 귀하)</p>
       <div class="tbl-wrap"><table><thead><tr><th style="color:#333">항목</th><th style="color:#333">내용</th><th style="text-align:right;color:#333">금액</th></tr></thead><tbody>
         <tr><td>헬스장 이용료</td><td>${v.gc}명 이용</td><td style="text-align:right">${gFee.toLocaleString()}원</td></tr>
         <tr><td>주차 이용료</td><td>${v.pc}대 등록</td><td style="text-align:right">${pFee.toLocaleString()}원</td></tr>
         <tr><td>사물함 이용료</td><td>${v.lc}개 사용</td><td style="text-align:right">${lFee.toLocaleString()}원</td></tr>
         <tr style="background:#f8f9fa;font-weight:700"><td>합계</td><td></td><td style="text-align:right">${(gFee + pFee + lFee).toLocaleString()}원</td></tr>
-      </tbody></table></div><div style="margin-top:20px;font-size:12px;color:#666;text-align:center">계좌: ${cfg.bank} | 문의: ${cfg.phone}</div></div>`;
+      </tbody></table></div><div style="margin-top:20px;font-size:12px;color:#666;text-align:center">계좌: ${cfg.bank} | 문의: ${esc(cfg.phone)}</div></div>`;
   });
   document.getElementById('bill-result').innerHTML = html || '<p class="tbl-empty">내역이 없습니다.</p>';
 }
@@ -2093,10 +2311,34 @@ function renderDB() {
   if (di) { di.innerHTML = '<option value="">선택</option>' + DONGS.map(d => `<option value="${d}">${d}동</option>`).join(''); }
   renderDBList();
 }
+// [v50] 현재 수정 중인 세대DB 레코드의 id (null이면 신규 등록 모드)
+let _dbEditingId = null;
+
 function clearDBForm() {
   ['db-dong-input','db-ho-input','db-name-input','db-member-input','db-phone-input'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   const al = document.getElementById('db-form-alert'); if(al) al.innerHTML = '';
+  _dbEditingId = null; // [v50] 수정 모드 해제
 }
+
+// gym/park/locker 쪽 레코드에 세대DB 변경사항을 반영하는 공통 처리
+function syncMemberToFeeData(oldRec, newRec) {
+  let count = 0;
+  [gymData, parkData, lockerData].forEach(arr => {
+    arr.forEach(r => {
+      // 변경 "전" 정보와 일치하는 레코드만 갱신한다 (회원번호 우선, 없으면 동+호+이름)
+      const matchByMember = oldRec.member && r.member === oldRec.member;
+      const matchByUnit   = r.dong === oldRec.dong && r.ho === oldRec.ho && r.name === oldRec.name;
+      if (matchByMember || matchByUnit) {
+        r.dong = newRec.dong; r.ho = newRec.ho; r.name = newRec.name;
+        if (newRec.member) r.member = newRec.member;
+        r.phone = newRec.phone;
+        count++;
+      }
+    });
+  });
+  return count;
+}
+
 function addDB() {
   const d  = document.getElementById('db-dong-input').value;
   const h  = document.getElementById('db-ho-input').value.trim();
@@ -2104,58 +2346,75 @@ function addDB() {
   const mb = (document.getElementById('db-member-input').value || '').trim();
   const ph = document.getElementById('db-phone-input').value.trim();
   const al = document.getElementById('db-form-alert');
+  const notify = (color, html, ms) => { if (al) { al.innerHTML = `<div style="color:${color};font-size:13px;margin-top:6px">${html}</div>`; setTimeout(() => { if (al) al.innerHTML = ''; }, ms || 3000); } };
+
   if (!d || !h || !n) { if(al) al.innerHTML = '<div style="color:#c0392b;font-size:13px;margin-top:6px">⚠ 동, 호수, 성명은 필수입니다.</div>'; return; }
   if(al) al.innerHTML = '';
 
-  // 회원번호 중복 체크 (같은 동호수+이름이 아닌 다른 세대에 이미 등록된 경우)
+  // 회원번호 중복 체크 — [v50] 자기 자신은 id로 정확히 제외한다
   if (mb) {
-    const dup = dbData.find(i => i.member === mb && !(i.dong === d && i.ho === h && i.name === n));
-    if (dup) { if(al) al.innerHTML = `<div style="color:#c0392b;font-size:13px;margin-top:6px">⚠ 회원번호 [${mb}]는 이미 ${dup.dong}동 ${dup.ho}호 (${dup.name})에 등록되어 있습니다.</div>`; return; }
+    const dup = dbData.find(i => i.member === mb && String(i.id) !== String(_dbEditingId));
+    if (dup) { notify('#c0392b', `⚠ 회원번호 [${esc(mb)}]는 이미 ${esc(dup.dong)}동 ${esc(dup.ho)}호 (${esc(dup.name)})에 등록되어 있습니다.`, 5000); return; }
   }
 
-  // 동+호+이름 3가지 모두 일치 → 기존 레코드 수정 (전화번호·회원번호 업데이트)
-  const exactMatch = dbData.find(i => i.dong === d && i.ho === h && i.name === n);
-  if (exactMatch) {
-    const oldMember = exactMatch.member || '';
-    exactMatch.member = mb;
-    exactMatch.phone  = ph;
-    // gym/park/locker 동기화: 이름까지 일치하는 레코드만
-    [gymData, parkData, lockerData].forEach(arr => {
-      arr.forEach(r => {
-        if (r.dong === d && r.ho === h && r.name === n) { r.phone = ph; if(mb) r.member = mb; }
-        else if (mb && r.member === mb) { r.phone = ph; }
-        else if (oldMember && r.member === oldMember) { if(mb) r.member = mb; r.phone = ph; }
-      });
-    });
+  const refreshAll = () => {
     save(); renderDBList();
     ['gym','park','locker'].forEach(t => { if(document.getElementById(t+'-list')) renderList(t); });
-    if(al) al.innerHTML = '<div style="color:#1a7a5e;font-size:13px;margin-top:6px">✅ 기존 구성원 정보가 수정되었습니다.</div>';
-    setTimeout(() => { if(al) al.innerHTML = ''; }, 3000);
+  };
+
+  // ── [v50] 수정 모드: id로 찾은 그 레코드만 갱신한다 ──
+  // v49는 "동+호+이름"으로 대상을 찾았기 때문에 이름을 바꾸면 같은 사람을 못 찾고
+  // 새 사람이 하나 더 생겨버렸습니다. 이제 이름을 바꿔도 동일인으로 유지됩니다.
+  if (_dbEditingId !== null) {
+    const rec = dbData.find(i => String(i.id) === String(_dbEditingId));
+    if (!rec) { _dbEditingId = null; notify('#c0392b', '⚠ 수정 대상을 찾을 수 없어 취소했습니다.'); return; }
+    const before = { dong: rec.dong, ho: rec.ho, name: rec.name, member: rec.member || '' };
+    rec.dong = d; rec.ho = h; rec.name = n; rec.member = mb; rec.phone = ph;
+    const synced = syncMemberToFeeData(before, rec);
+    _dbEditingId = null;
+    refreshAll();
+    notify('#1a7a5e', `✅ 구성원 정보가 수정되었습니다.${synced ? ` (헬스장·주차·사물함 ${synced}건 동기화)` : ''}`);
+    return;
+  }
+
+  // ── 신규 등록 모드 ──
+  // 동+호+이름이 모두 같은 사람이 이미 있으면 새로 만들지 않고 정보만 갱신
+  const exactMatch = dbData.find(i => i.dong === d && i.ho === h && i.name === n);
+  if (exactMatch) {
+    const before = { dong: exactMatch.dong, ho: exactMatch.ho, name: exactMatch.name, member: exactMatch.member || '' };
+    exactMatch.member = mb;
+    exactMatch.phone  = ph;
+    const synced = syncMemberToFeeData(before, exactMatch);
+    refreshAll();
+    notify('#1a7a5e', `✅ 기존 구성원 정보가 수정되었습니다.${synced ? ` (헬스장·주차·사물함 ${synced}건 동기화)` : ''}`);
     return;
   }
 
   // 동+호가 같고 이름이 다름 → 가족구성원으로 누적 추가
   const sameUnit = dbData.find(i => i.dong === d && i.ho === h);
+  dbData.push({ id: uid(), dong: d, ho: h, name: n, member: mb, phone: ph, date: new Date().toISOString().split('T')[0] });
+  refreshAll();
   if (sameUnit) {
-    // 가족구성원 추가 (신규 레코드 push)
-    dbData.push({ dong: d, ho: h, name: n, member: mb, phone: ph, date: new Date().toISOString().split('T')[0] });
-    save(); renderDBList();
-    ['gym','park','locker'].forEach(t => { if(document.getElementById(t+'-list')) renderList(t); });
-    const familyNames = dbData.filter(i => i.dong === d && i.ho === h).map(i => i.name).join(', ');
-    if(al) al.innerHTML = `<div style="color:#0b6ec8;font-size:13px;margin-top:6px">👨‍👩‍👧 ${d}동 ${h}호 가족구성원으로 추가되었습니다. (현재 구성원: ${familyNames})</div>`;
-    setTimeout(() => { if(al) al.innerHTML = ''; }, 4000);
-    return;
+    const familyNames = dbData.filter(i => i.dong === d && i.ho === h).map(i => i.name || '(이름없음)').join(', ');
+    notify('#0b6ec8', `👨‍👩‍👧 ${esc(d)}동 ${esc(h)}호 가족구성원으로 추가되었습니다. (현재 구성원: ${esc(familyNames)})`, 4000);
+  } else {
+    notify('#1a7a5e', '✅ 신규 세대가 등록되었습니다.');
   }
-
-  // 새 세대 신규 등록
-  dbData.push({ dong: d, ho: h, name: n, member: mb, phone: ph, date: new Date().toISOString().split('T')[0] });
-  save(); renderDBList();
-  ['gym','park','locker'].forEach(t => { if(document.getElementById(t+'-list')) renderList(t); });
-  if(al) al.innerHTML = '<div style="color:#1a7a5e;font-size:13px;margin-top:6px">✅ 신규 세대가 등록되었습니다.</div>';
-  setTimeout(() => { if(al) al.innerHTML = ''; }, 3000);
 }
-function deleteDB(idx) { if (!confirm('삭제하시겠습니까?')) return; dbData.splice(idx, 1); save(); renderDBList(); }
-function clearAllDB() { if (!confirm('정말 모든 세대 데이터를 초기화하시겠습니까?')) return; dbData = []; save(); renderDBList(); }
+
+// [v50 수정 5번] deleteDB(idx) 제거.
+// 정렬·필터된 화면의 인덱스와 원본 배열의 인덱스가 서로 달라 엉뚱한 세대를
+// 지울 수 있는 함수였습니다. id 기반 deleteDBFromBtn()으로 대체했습니다.
+// editDB() / deleteDBByInfo() 도 같은 이유로 제거했습니다(호출부 없음).
+
+function clearAllDB() {
+  // [v50] 전체 초기화는 되돌릴 수 없으므로 2단계 확인 + 백업 안내
+  if (!confirm(`⚠️ 세대 데이터 ${dbData.length}건을 모두 삭제합니다.\n되돌릴 수 없습니다.\n\n먼저 [전체 데이터 백업]을 받으셨나요?`)) return;
+  if (!confirm('정말 모든 세대 데이터를 초기화하시겠습니까?\n마지막 확인입니다.')) return;
+  dbData = []; _dbEditingId = null; save(); renderDBList(); clearDBForm();
+  alert('세대 데이터가 초기화되었습니다.');
+}
+
 function autoGenDB() {
   const totalBuildings = cfg.buildings || 8;
   const totalHouseholds = cfg.households || 648;
@@ -2171,7 +2430,7 @@ function autoGenDB() {
       for (let l = 1; l <= linesPerFloor; l++) {
         const ho = (f * 100 + l).toString();
         if (!dbData.find(i => i.dong === d && i.ho === ho)) {
-          dbData.push({ dong: d, ho: ho, name: '', member: '', phone: '', date: today });
+          dbData.push({ id: uid(), dong: d, ho: ho, name: '', member: '', phone: '', date: today });
         }
       }
     }
@@ -2197,10 +2456,10 @@ function renderDBList() {
     const isSameUnit = (key === prevKey);
     const tr = document.createElement('tr');
     // 같은 동호 두 번째 이후 구성원은 동·호 칸 비워서 그룹임을 시각적으로 표현
-    const dongCell = isSameUnit ? `<td style="color:var(--text2);padding-left:28px">└ 가족</td><td></td>` : `<td>${i.dong}동</td><td>${i.ho}호</td>`;
-    tr.innerHTML = `${dongCell}<td>${i.name||''}</td><td>${i.member||'-'}</td><td>${i.phone||'-'}</td><td>${i.date||''}</td>
-      <td><button class="btn btn-outline btn-sm" data-dong="${i.dong}" data-ho="${i.ho}" data-name="${(i.name||'').replace(/"/g,'&quot;')}" onclick="editDBFromBtn(this)">수정</button></td>
-      <td><button class="btn btn-red btn-sm" data-dong="${i.dong}" data-ho="${i.ho}" data-name="${(i.name||'').replace(/"/g,'&quot;')}" onclick="deleteDBFromBtn(this)">삭제</button></td>`;
+    const dongCell = isSameUnit ? `<td style="color:var(--text2);padding-left:28px">└ 가족</td><td></td>` : `<td>${esc(i.dong)}동</td><td>${esc(i.ho)}호</td>`;
+    tr.innerHTML = `${dongCell}<td>${esc(i.name||'')}</td><td>${esc(i.member||'-')}</td><td>${esc(i.phone||'-')}</td><td>${i.date||''}</td>
+      <td><button class="btn btn-outline btn-sm" data-id="${i.id}" onclick="editDBFromBtn(this)">수정</button></td>
+      <td><button class="btn btn-red btn-sm" data-id="${i.id}" onclick="deleteDBFromBtn(this)">삭제</button></td>`;
     tbody.appendChild(tr);
     prevKey = key;
   });
@@ -2210,31 +2469,38 @@ function renderDBList() {
   const countBar = document.getElementById('db-count-bar');
   if (countBar) countBar.innerText = `총 ${filtered.length}명 표시 (전체 ${dbData.length}명 / ${uniqueUnits}세대)`;
 }
+// [v50 수정 4번] 동+호+이름 조합 대신 고유 id로 정확히 한 건만 찾는다.
+function findDbById(idStr) {
+  return dbData.find(item => String(item.id) === String(idStr));
+}
+
 function editDBFromBtn(btn) {
-  const d = btn.getAttribute('data-dong'), h = btn.getAttribute('data-ho'), n = btn.getAttribute('data-name') || '';
-  // 동+호+이름으로 정확한 구성원 찾기 (가족구성원 구분)
-  const i = dbData.find(item => item.dong === d && item.ho === h && item.name === n)
-         || dbData.find(item => item.dong === d && item.ho === h);
-  if (!i) return;
+  const i = findDbById(btn.getAttribute('data-id'));
+  if (!i) { alert('⚠️ 해당 구성원을 찾을 수 없습니다. 목록을 새로고침해주세요.'); return; }
+  _dbEditingId = i.id; // [v50] 수정 중인 대상을 명시적으로 기억
   document.getElementById('db-dong-input').value = i.dong;
   document.getElementById('db-ho-input').value = i.ho;
   document.getElementById('db-name-input').value = i.name || '';
   document.getElementById('db-member-input').value = i.member || '';
   document.getElementById('db-phone-input').value = i.phone || '';
-  document.getElementById('db-dong-input').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const al = document.getElementById('db-form-alert');
+  if (al) al.innerHTML = `<div style="color:#0b6ec8;font-size:13px;margin-top:6px">✏️ ${esc(i.dong)}동 ${esc(i.ho)}호 ${esc(i.name || '(이름없음)')} 님을 수정 중입니다. 이름을 바꿔도 같은 사람으로 유지됩니다.</div>`;
+  const focusEl = document.getElementById('db-dong-input');
+  if (focusEl && typeof focusEl.scrollIntoView === 'function') focusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
-function editDB(dong, ho, name) { editDBFromBtn({ getAttribute: (k) => k==='data-dong'?dong : k==='data-ho'?ho : (name||'') }); }
-function deleteDBFromBtn(btn) {
-  const d = btn.getAttribute('data-dong'), h = btn.getAttribute('data-ho'), n = btn.getAttribute('data-name') || '';
-  if (!confirm(`${d}동 ${h}호 ${n ? '['+n+'] ' : ''}구성원을 삭제하시겠습니까?`)) return;
-  // 동+호+이름 기준으로 해당 구성원만 삭제
-  const idx = dbData.findIndex(item => item.dong === d && item.ho === h && item.name === n);
-  const fallbackIdx = idx === -1 ? dbData.findIndex(item => item.dong === d && item.ho === h) : -1;
-  const delIdx = idx > -1 ? idx : fallbackIdx;
-  if (delIdx > -1) { dbData.splice(delIdx, 1); save(); renderDBList(); }
-}
-function deleteDBByInfo(dong, ho, name) { deleteDBFromBtn({ getAttribute: (k) => k==='data-dong'?dong : k==='data-ho'?ho : (name||'') }); }
 
+function deleteDBFromBtn(btn) {
+  const i = findDbById(btn.getAttribute('data-id'));
+  if (!i) { alert('⚠️ 해당 구성원을 찾을 수 없습니다. 목록을 새로고침해주세요.'); return; }
+  if (!confirm(`${i.dong}동 ${i.ho}호 ${i.name ? '[' + i.name + '] ' : ''}구성원을 삭제하시겠습니까?`)) return;
+  const idx = dbData.findIndex(item => String(item.id) === String(i.id));
+  if (idx > -1) {
+    dbData.splice(idx, 1);
+    if (_dbEditingId !== null && String(_dbEditingId) === String(i.id)) { _dbEditingId = null; clearDBForm(); }
+    save();
+    renderDBList();
+  }
+}
 // DB 불러오기 모달
 let _dbModalTarget = null;
 function openDBModal(prefix) {
@@ -2268,8 +2534,8 @@ function renderDBModal() {
     return;
   }
   tbody.innerHTML = list.map(i =>
-    `<tr data-dong="${i.dong}" data-ho="${i.ho}" data-name="${(i.name||'').replace(/"/g,'&quot;')}" data-member="${i.member||''}" data-phone="${i.phone||''}" onclick="selectFromDB(this)">
-      <td>${i.dong}동</td><td>${i.ho}호</td><td><b>${i.name||''}</b></td><td>${i.member||'-'}</td><td>${i.phone||'-'}</td>
+    `<tr data-dong="${esc(i.dong)}" data-ho="${esc(i.ho)}" data-name="${esc(i.name)}" data-member="${esc(i.member||'')}" data-phone="${esc(i.phone||'')}" onclick="selectFromDB(this)">
+      <td>${esc(i.dong)}동</td><td>${esc(i.ho)}호</td><td><b>${esc(i.name||'')}</b></td><td>${esc(i.member||'-')}</td><td>${esc(i.phone||'-')}</td>
     </tr>`
   ).join('');
 }
@@ -2304,20 +2570,72 @@ function autoFill(p) {
 
 function loadSettings() {
   document.getElementById('s-gym-fee').value = cfg.gymFee; document.getElementById('s-gym-base').value = cfg.gymBase; document.getElementById('s-gym-add').value = cfg.gymAdd;
-  document.getElementById('s-cut-day').value = cfg.cutDay; document.getElementById('s-park-fee').value = cfg.parkFee; document.getElementById('s-park-base').value = cfg.parkBase;
+  document.getElementById('s-park-fee').value = cfg.parkFee; document.getElementById('s-park-base').value = cfg.parkBase;
+  // [v50] 종목별 부과 기준일
+  document.getElementById('s-gym-cut-day').value    = getCutDay('gym');
+  document.getElementById('s-park-cut-day').value   = getCutDay('park');
+  document.getElementById('s-locker-cut-day').value = getCutDay('locker');
   document.getElementById('s-park-add').value = cfg.parkAdd; document.getElementById('s-locker-fee').value = cfg.lockerFee; document.getElementById('s-bank').value = cfg.bank; document.getElementById('s-phone').value = cfg.phone;
   document.getElementById('s-buildings').value = cfg.buildings || 8;
   document.getElementById('s-households').value = cfg.households || 648;
   updateHeaderInfo();
   updateSettingsUI();
+  previewCutDay();      // [v50] 기준일 설명 미리보기
+  updateStorageMeter(); // [v50] 저장 공간 사용량 표시
+}
+
+// ── [v50] 기준일을 입력하는 즉시 "무슨 뜻인지" 문장으로 보여준다 ──
+function previewCutDay() {
+  const box = document.getElementById('cut-day-preview');
+  if (!box) return;
+  const rows = [
+    { id: 's-gym-cut-day',    label: '🏋️ 헬스장' },
+    { id: 's-park-cut-day',   label: '🚗 주차' },
+    { id: 's-locker-cut-day', label: '🔐 사물함' }
+  ].map(r => {
+    const el = document.getElementById(r.id);
+    const n = parseInt(el ? el.value : '', 10);
+    if (!Number.isFinite(n) || n < 1 || n > 31) {
+      return `<div style="color:var(--red)">${r.label} : ⚠ 1~31 사이의 숫자를 입력하세요.</div>`;
+    }
+    if (n === 31) {
+      return `<div>${r.label} : 등록일과 무관하게 <b>항상 당월부터</b> 부과`;
+    }
+    return `<div>${r.label} : <b>${n}일까지</b> 등록 → 당월 부과 / <b>${n + 1}일부터</b> 등록 → 익월 부과</div>`;
+  }).join('');
+  box.innerHTML = `<div style="font-size:13px;line-height:1.9;padding:10px;background:var(--bg2);border-radius:8px">${rows}</div>`;
 }
 function updateHeaderInfo(){document.getElementById('header-세대').textContent=`${cfg.buildings||8}개동 ${cfg.households||648}세대`;}
-function updateSettingsUI() { document.getElementById('settings-summary').innerHTML = `• 아파트 정보: ${cfg.buildings||8}개동 / ${cfg.households||648}세대<br>• 헬스장: 기본 ${cfg.gymFee.toLocaleString()}원 (${cfg.gymBase}명까지) / 추가 ${cfg.gymAdd.toLocaleString()}원<br>• 주차: 기본 ${cfg.parkFee.toLocaleString()}원 (${cfg.parkBase}대까지) / 추가 ${cfg.parkAdd.toLocaleString()}원<br>• 사물함: 개당 ${cfg.lockerFee.toLocaleString()}원<br>• 부과기준: 매월 ${cfg.cutDay}일 이후 등록 시 다음 달부터 부과`; }
+function updateSettingsUI() { document.getElementById('settings-summary').innerHTML = `• 아파트 정보: ${cfg.buildings||8}개동 / ${cfg.households||648}세대<br>• 헬스장: 기본 ${cfg.gymFee.toLocaleString()}원 (${cfg.gymBase}명까지) / 추가 ${cfg.gymAdd.toLocaleString()}원<br>• 주차: 기본 ${cfg.parkFee.toLocaleString()}원 (${cfg.parkBase}대까지) / 추가 ${cfg.parkAdd.toLocaleString()}원<br>• 사물함: 개당 ${cfg.lockerFee.toLocaleString()}원<br>• 부과기준일: 헬스장 ${getCutDay('gym')}일 / 주차 ${getCutDay('park')}일 / 사물함 ${getCutDay('locker')}일 (31=등록일 무관 당월부과)`; }
 function saveSettings() {
   cfg.gymFee = parseInt(document.getElementById('s-gym-fee').value);
   cfg.gymBase = parseInt(document.getElementById('s-gym-base').value);
   cfg.gymAdd = parseInt(document.getElementById('s-gym-add').value);
-  cfg.cutDay = parseInt(document.getElementById('s-cut-day').value);
+  // [v50] 종목별 부과 기준일 (1~31 범위 검증)
+  const readCut = (id, label) => {
+    const n = parseInt(document.getElementById(id).value, 10);
+    if (!Number.isFinite(n) || n < 1 || n > 31) { alert(`⚠️ ${label} 부과 기준일은 1~31 사이의 숫자여야 합니다.`); return null; }
+    return n;
+  };
+  const gc = readCut('s-gym-cut-day', '헬스장');    if (gc === null) return;
+  const pc = readCut('s-park-cut-day', '주차');      if (pc === null) return;
+  const lc = readCut('s-locker-cut-day', '사물함');  if (lc === null) return;
+
+  // 기준일이 실제로 바뀌면 과거 부과액까지 재계산되므로 한 번 더 확인받는다
+  const changes = [];
+  if (gc !== getCutDay('gym'))    changes.push(`헬스장 ${getCutDay('gym')}일 → ${gc}일`);
+  if (pc !== getCutDay('park'))   changes.push(`주차 ${getCutDay('park')}일 → ${pc}일`);
+  if (lc !== getCutDay('locker')) changes.push(`사물함 ${getCutDay('locker')}일 → ${lc}일`);
+  if (changes.length) {
+    if (!confirm(
+      '⚠️ 부과 기준일을 변경합니다.\n\n' + changes.map(c => '· ' + c).join('\n') +
+      '\n\n이 프로그램은 부과액을 조회할 때마다 다시 계산하므로,\n' +
+      '이미 지나간 달의 부과 내역도 함께 바뀝니다.\n\n' +
+      '[전체 데이터 백업]을 받아두셨나요? 계속하시겠습니까?'
+    )) return;
+  }
+  cfg.gymCutDay = gc; cfg.parkCutDay = pc; cfg.lockerCutDay = lc;
+  cfg.cutDay = gc; // 구버전 호환용으로 헬스장 값을 유지
   cfg.parkFee = parseInt(document.getElementById('s-park-fee').value);
   cfg.parkBase = parseInt(document.getElementById('s-park-base').value);
   cfg.parkAdd = parseInt(document.getElementById('s-park-add').value);
@@ -2337,18 +2655,20 @@ function saveSettings() {
   updateSettingsUI();
   alert('✅ 설정이 저장되었습니다.');
 }
-function resetSettings() { if (!confirm('기본값으로 초기화하시겠습니까?')) return; cfg = { "gymFee": 10000, "gymAdd": 5000, "gymBase": 2, "parkFee": 30000, "parkAdd": 50000, "parkBase": 2, "lockerFee": 3000, "cutDay": 20, "bank": "농협 000-0000-0000-00", "phone": "054-000-0000", "buildings":8, "households":648 }; save(); rebuildDongs(); loadSettings(); updateHeaderInfo(); }
+function resetSettings() { if (!confirm('기본값으로 초기화하시겠습니까?')) return; cfg = { "gymFee": 10000, "gymAdd": 5000, "gymBase": 2, "parkFee": 30000, "parkAdd": 50000, "parkBase": 2, "lockerFee": 3000, "cutDay": 20, "gymCutDay": 20, "parkCutDay": 31, "lockerCutDay": 31, "bank": "농협 000-0000-0000-00", "phone": "054-000-0000", "buildings":8, "households":648 }; save(); rebuildDongs(); loadSettings(); updateHeaderInfo(); }
 
-function exportBackup() { const blob = new Blob([JSON.stringify({ gym: gymData, park: parkData, locker: lockerData, db: dbData, cfg: cfg })], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `아파트관리_백업_${new Date().toISOString().slice(0, 10)}.json`; a.click(); }
-function importBackup(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { try { const d = JSON.parse(ev.target.result); gymData = d.gym || []; parkData = d.park || []; lockerData = d.locker || []; dbData = d.db || []; cfg = d.cfg || cfg; save(); alert('✅ 데이터 복구가 완료되었습니다.'); location.reload(); } catch(err) { alert('❌ 올바른 백업 파일이 아닙니다.'); } }; r.readAsText(f); }
+// [v50 수정 5번] 레거시 exportBackup() / importBackup() 제거.
+// 이 두 함수는 gym/park/locker/db/cfg 5종만 다루어, 업무일정·체납·점검·민원·재고·
+// 법정점검·자산 데이터를 통째로 누락시키면서도 사용자에게는 "백업 완료"로 보였습니다.
+// 전체 백업은 exportFullData() / importFullData() 로 일원화했습니다.
 function renderDash() { const uniqueUnits = new Set(dbData.map(i => i.dong + '-' + i.ho)).size; document.getElementById('dash-stat-grid').innerHTML = `<div class="stat-card green"><div class="s-label">🏃 헬스장 이용</div><div class="s-val">${gymData.filter(r => !r.cancelDate).length}명</div></div><div class="stat-card blue"><div class="s-label">🚗 주차 등록</div><div class="s-val">${parkData.filter(r => !r.cancelDate).length}대</div></div><div class="stat-card purple"><div class="s-label">📦 사물함 사용</div><div class="s-val">${lockerData.filter(r => !r.cancelDate).length}개</div></div><div class="stat-card amber"><div class="s-label">🏘️ 전체 세대</div><div class="s-val">${uniqueUnits}세대</div></div>`; }
 
 function exportToExcel() {
   const ym = document.getElementById('e-month').value; if(!ym) { alert('연월을 선택하세요.'); return; }
   const house = {};
-  gymData.filter(r => isActive(r, ym, true)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].gc++; house[k].members.push({ 구분: '헬스장', 성명: r.name, 회원번호: r.member || '', 전화번호: r.phone || '' }); });
-  parkData.filter(r => isActive(r, ym)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].pc++; house[k].members.push({ 구분: '주차', 성명: r.name + (r.carnum ? ' (' + r.carnum + ')' : ''), 회원번호: r.member || '', 전화번호: r.phone || '' }); });
-  lockerData.filter(r => isActive(r, ym)).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].lc++; house[k].members.push({ 구분: '사물함', 성명: r.name, 회원번호: r.member || '', 전화번호: r.phone || '' }); });
+  gymData.filter(r => isActive(r, ym, 'gym')).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].gc++; house[k].members.push({ 구분: '헬스장', 성명: r.name, 회원번호: r.member || '', 전화번호: r.phone || '' }); });
+  parkData.filter(r => isActive(r, ym, 'park')).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].pc++; house[k].members.push({ 구분: '주차', 성명: r.name + (r.carnum ? ' (' + r.carnum + ')' : ''), 회원번호: r.member || '', 전화번호: r.phone || '' }); });
+  lockerData.filter(r => isActive(r, ym, 'locker')).forEach(r => { const k = r.dong + '-' + r.ho; if (!house[k]) house[k] = { dong: r.dong, ho: r.ho, gc: 0, pc: 0, lc: 0, members: [] }; house[k].lc++; house[k].members.push({ 구분: '사물함', 성명: r.name, 회원번호: r.member || '', 전화번호: r.phone || '' }); });
   const rows = [];
   Object.values(house).sort((a, b) => a.dong === b.dong ? (parseInt(a.ho) || 0) - (parseInt(b.ho) || 0) : a.dong.localeCompare(b.dong)).forEach(v => {
     const g = v.gc <= cfg.gymBase ? (v.gc > 0 ? cfg.gymFee : 0) : cfg.gymFee + (v.gc - cfg.gymBase) * cfg.gymAdd;
@@ -2372,6 +2692,7 @@ function exportToExcel() {
 
 window.onload = () => {
   document.getElementById('header-date').textContent = new Date().toLocaleDateString();
+  migrateData(); // [v50] 기존 데이터에 고유 ID 부여 (최초 1회)
   rebuildDongs(); // 동 드롭다운 최초 초기화 (DOM 로드 후)
   const savedTheme = localStorage.getItem(KEYS.THEME) || 'light'; setTheme(savedTheme);
   showPage('dash');
@@ -2537,16 +2858,236 @@ window.addEventListener('load', function () {
 window.__isCloudRestoring__ = false; // 클라우드→로컬 복원 중에는 재동기화 업로드를 막기 위한 플래그
 let cloudSyncDebounceTimer = null;   // 연속 저장을 하나로 묶기 위한 디바운스 타이머
 
+// ── [v50] 동기화 메타 정보 키 ────────────────────────────────
+// 이 키들은 "데이터"가 아니라 "동기화용 부속 정보"이므로
+// 클라우드 업로드 payload의 data 안에는 넣지 않는다. (스냅샷 비교 오염 방지)
+const SYNC_META_KEY = 'apt_sync_meta_v50';
+const SYNC_EXCLUDE_KEYS = [SYNC_META_KEY];
+
+// 네이티브 원본 보관 (래핑된 함수를 다시 호출하는 무한재귀 방지용)
+const __nativeSetItem    = localStorage.setItem.bind(localStorage);
+const __nativeRemoveItem = localStorage.removeItem.bind(localStorage);
+const __nativeClear      = localStorage.clear.bind(localStorage);
+const __nativeGetItem    = localStorage.getItem.bind(localStorage);
+
+// ── [v50] 현재 LocalStorage 사용량 계산 (진단·경고용) ────────
+function getStorageUsage() {
+  let bytes = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    const v = __nativeGetItem(k) || '';
+    bytes += (k.length + v.length) * 2; // UTF-16 기준 근사치
+  }
+  const LIMIT = 5 * 1024 * 1024; // 브라우저 통상 한도 약 5MB
+  return { bytes, mb: (bytes / 1024 / 1024).toFixed(2), percent: Math.min(100, Math.round(bytes / LIMIT * 100)) };
+}
+
+// ── [v50] 어떤 키가 용량을 잡아먹는지 상위 3개 추출 ──────────
+function getStorageHeavyKeys() {
+  const list = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    list.push({ key: k, kb: Math.round(((__nativeGetItem(k) || '').length * 2) / 1024) });
+  }
+  return list.sort((a, b) => b.kb - a.kb).slice(0, 3);
+}
+
+function __isQuotaError(e) {
+  return e && (
+    e.name === 'QuotaExceededError' ||
+    e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || // Firefox
+    e.code === 22 || e.code === 1014
+  );
+}
+
+// ── [v50] 마지막 로컬 변경 시각 기록 ─────────────────────────
+// 클라우드가 로컬을 무조건 덮어쓰던 문제(수정 2번)를 해결하기 위한 기준값.
+function markLocalChange() {
+  try {
+    __nativeSetItem(SYNC_META_KEY, JSON.stringify({ changedAt: new Date().toISOString() }));
+  } catch (e) { /* 메타 기록 실패는 본 기능을 막지 않음 */ }
+}
+function getLocalChangedAt() {
+  try {
+    const m = JSON.parse(__nativeGetItem(SYNC_META_KEY) || '{}');
+    return m.changedAt || null;
+  } catch (e) { return null; }
+}
+
 (function () {
-  const nativeSetItem = localStorage.setItem.bind(localStorage);
+  // ── setItem 래핑: 저장 실패(용량초과)를 절대 조용히 넘기지 않는다 ──
   localStorage.setItem = function (key, value) {
-    nativeSetItem(key, value); // 1) 기존 로컬 저장은 항상 정상적으로 먼저 수행됨 (변경 없음)
-    // 2) 클라우드 복원 도중에 발생한 setItem은 재업로드를 트리거하지 않음 (무한 동기화 방지)
+    try {
+      __nativeSetItem(key, value);
+    } catch (e) {
+      if (__isQuotaError(e)) {
+        const u = getStorageUsage();
+        const heavy = getStorageHeavyKeys().map(h => `  · ${h.key} : ${h.kb}KB`).join('\n');
+        alert(
+          '❌ 저장 공간이 가득 차서 저장하지 못했습니다.\n\n' +
+          `현재 사용량: 약 ${u.mb}MB (한도 약 5MB)\n\n` +
+          '용량을 많이 쓰는 항목:\n' + heavy + '\n\n' +
+          '▶ 조치 방법\n' +
+          '1) [설정] → [전체 데이터 백업]으로 먼저 백업하세요.\n' +
+          '2) 오래된 민원 사진이나 점검 첨부파일을 삭제하세요.\n' +
+          '3) [설정] → [사진 용량 정리]를 실행하면 기존 사진을 자동 압축합니다.\n\n' +
+          '⚠️ 이번에 입력하신 내용은 저장되지 않았습니다.'
+        );
+      } else {
+        alert('❌ 저장 중 오류가 발생했습니다: ' + (e && e.message ? e.message : e));
+      }
+      // 반드시 다시 던진다.
+      // 삼키면 호출부가 그대로 진행되어 "저장되었습니다" 안내가 잘못 뜨게 된다.
+      throw e;
+    }
+    if (!window.__isCloudRestoring__ && key !== SYNC_META_KEY) {
+      markLocalChange();
+      scheduleCloudSync();
+    }
+  };
+
+  // ── removeItem / clear 도 함께 후킹 ──
+  // (v49에서는 setItem만 후킹되어 있어서 "삭제"가 클라우드에 반영되지 않았음)
+  localStorage.removeItem = function (key) {
+    __nativeRemoveItem(key);
+    if (!window.__isCloudRestoring__ && key !== SYNC_META_KEY) {
+      markLocalChange();
+      scheduleCloudSync();
+    }
+  };
+  localStorage.clear = function () {
+    __nativeClear();
     if (!window.__isCloudRestoring__) {
+      markLocalChange();
       scheduleCloudSync();
     }
   };
 })();
+
+// ================================================================
+// 🖼️ [v50 수정 1번] 첨부 이미지 자동 축소·압축
+// v49에서는 카메라 원본(3~5MB)을 base64로 그대로 LocalStorage에 넣어서
+// 사진 두어 장이면 5MB 한도가 터졌음. 여기서 미리 줄여서 넣는다.
+// ================================================================
+const IMG_MAX_SIDE = 1280;   // 긴 변 기준 최대 픽셀
+const IMG_QUALITY  = 0.7;    // JPEG 품질
+const IMG_MAX_INPUT_MB = 20; // 이보다 큰 원본은 아예 거절
+
+// 파일(또는 dataURL)을 받아 축소된 JPEG dataURL을 돌려준다.
+function compressImage(input, maxSide = IMG_MAX_SIDE, quality = IMG_QUALITY) {
+  return new Promise((resolve, reject) => {
+    const srcPromise = (typeof input === 'string')
+      ? Promise.resolve(input)
+      : new Promise((res, rej) => {
+          const r = new FileReader();
+          r.onload = e => res(e.target.result);
+          r.onerror = () => rej(new Error('파일을 읽지 못했습니다.'));
+          r.readAsDataURL(input);
+        });
+
+    srcPromise.then(dataUrl => {
+      const img = new Image();
+      img.onload = function () {
+        try {
+          let { width: w, height: h } = img;
+          if (w > maxSide || h > maxSide) {
+            const ratio = Math.min(maxSide / w, maxSide / h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';           // 투명 PNG가 검게 나오는 것 방지
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } catch (err) { reject(err); }
+      };
+      img.onerror = () => reject(new Error('이미지 형식을 인식하지 못했습니다.'));
+      img.src = dataUrl;
+    }).catch(reject);
+  });
+}
+
+// 업로드 <input type=file> 하나를 처리하는 공통 루틴
+// onDone(dataUrl, infoText) 형태로 결과를 돌려준다.
+async function handleImageUpload(file, onDone) {
+  if (!file) return;
+  if (!/^image\//.test(file.type)) {
+    alert('⚠️ 이미지 파일만 첨부할 수 있습니다. (jpg, png, gif, webp)');
+    return;
+  }
+  if (file.size > IMG_MAX_INPUT_MB * 1024 * 1024) {
+    alert(`⚠️ 파일이 너무 큽니다. (${(file.size / 1024 / 1024).toFixed(1)}MB)\n${IMG_MAX_INPUT_MB}MB 이하 이미지만 첨부해주세요.`);
+    return;
+  }
+  try {
+    const compressed = await compressImage(file);
+    const beforeKB = Math.round(file.size / 1024);
+    const afterKB  = Math.round(compressed.length * 0.75 / 1024); // base64 → 실제 바이트 근사
+    onDone(compressed, `${beforeKB}KB → ${afterKB}KB 로 자동 압축됨`);
+  } catch (err) {
+    console.error('이미지 압축 실패:', err);
+    alert('❌ 이미지를 처리하지 못했습니다: ' + err.message);
+  }
+}
+
+// ── [v50] 이미 저장돼 있는 큰 사진들을 일괄 압축 (설정 화면에서 호출) ──
+async function compactStoredPhotos() {
+  const before = getStorageUsage();
+  if (!confirm(
+    `기존에 저장된 민원 사진과 점검 첨부파일을 일괄 압축합니다.\n\n` +
+    `현재 사용량: 약 ${before.mb}MB\n\n` +
+    `※ 화질이 다소 낮아지며 되돌릴 수 없습니다.\n` +
+    `※ 실행 전에 [전체 데이터 백업]을 먼저 받아두시길 권합니다.\n\n계속하시겠습니까?`
+  )) return;
+
+  let count = 0;
+  // 민원 사진
+  try {
+    const civils = JSON.parse(localStorage.getItem(CIV_KEY) || '[]');
+    for (const c of civils) {
+      if (c.photo && c.photo.startsWith('data:image') && c.photo.length > 200 * 1024) {
+        c.photo = await compressImage(c.photo);
+        count++;
+      }
+    }
+    localStorage.setItem(CIV_KEY, JSON.stringify(civils));
+  } catch (e) { console.error('민원 사진 압축 실패:', e); }
+
+  // 법정점검 첨부(이미지인 경우만)
+  try {
+    const legals = JSON.parse(localStorage.getItem(LEGAL_KEY) || '[]');
+    for (const l of legals) {
+      if (l.file && l.file.startsWith('data:image') && l.file.length > 200 * 1024) {
+        l.file = await compressImage(l.file);
+        count++;
+      }
+    }
+    localStorage.setItem(LEGAL_KEY, JSON.stringify(legals));
+  } catch (e) { console.error('점검 첨부 압축 실패:', e); }
+
+  const after = getStorageUsage();
+  alert(`✅ 정리 완료\n\n압축한 이미지: ${count}건\n사용량: ${before.mb}MB → ${after.mb}MB`);
+  updateStorageMeter();
+}
+
+// ── [v50] 설정 화면 저장소 사용량 표시 ──
+function updateStorageMeter() {
+  const el = document.getElementById('storage-meter');
+  if (!el) return;
+  const u = getStorageUsage();
+  const color = u.percent >= 80 ? 'var(--red)' : (u.percent >= 60 ? 'var(--amber)' : 'var(--accent)');
+  el.innerHTML =
+    `<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+       <span>저장소 사용량</span><span style="color:${color};font-weight:700">${u.mb}MB / 약 5MB (${u.percent}%)</span>
+     </div>
+     <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+       <div style="height:100%;width:${u.percent}%;background:${color};transition:width .3s"></div>
+     </div>` +
+    (u.percent >= 80 ? `<div style="color:var(--red);font-size:12px;margin-top:6px">⚠️ 곧 저장이 실패할 수 있습니다. 사진 용량 정리를 실행하세요.</div>` : '');
+}
 
 // LocalStorage 변경이 여러 번 연속 발생해도(예: 일괄 저장) 마지막 변경 후
 // 1.5초 뒤에 딱 한 번만 구글 드라이브에 업로드하도록 묶어줌 (API 과다 호출 방지)
@@ -2670,7 +3211,7 @@ function renderSchedule() {
     
     tr.innerHTML = `
       <td style="text-align:center;"><input type="checkbox" ${s.completed ? 'checked' : ''} onclick="toggleSchedComplete(${s.id})"></td>
-      <td class="${s.completed ? 'sched-completed' : ''}">${s.title}</td>
+      <td class="${s.completed ? 'sched-completed' : ''}">${esc(s.title)}</td>
       <td>${s.date}</td>
       <td><span class="d-day-badge ${dDayClass}">${dDayText}</span></td>
       <td>${s.repeat !== 'none' ? `<span class="repeat-badge">${repeatText}</span>` : '-'}</td>
@@ -2788,13 +3329,13 @@ function renderArrears() {
   arrears.forEach(a => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${a.dong}</td>
-      <td>${a.ho}</td>
-      <td>${a.name}</td>
+      <td>${esc(a.dong)}</td>
+      <td>${esc(a.ho)}</td>
+      <td>${esc(a.name)}</td>
       <td>${parseInt(a.amount || 0).toLocaleString()}원</td>
       <td>${a.months || 0}개월</td>
       <td>${a.date || '-'}</td>
-      <td style="font-size:12px; color:var(--text2);">${a.memo || '-'}</td>
+      <td style="font-size:12px; color:var(--text2);">${esc(a.memo || '-')}</td>
       <td style="text-align:center;">
         <button class="btn btn-outline btn-sm" onclick="editArrears(${a.id})">수정</button>
         <button class="btn btn-red btn-sm" onclick="deleteArrears(${a.id})">삭제</button>
@@ -2928,11 +3469,11 @@ function renderInspection() {
     
     tr.innerHTML = `
       <td style="text-align:center;"><input type="checkbox" ${i.completed ? 'checked' : ''} onclick="toggleInsComplete(${i.id})"></td>
-      <td class="${i.completed ? 'sched-completed' : ''}">${i.name}</td>
+      <td class="${i.completed ? 'sched-completed' : ''}">${esc(i.name)}</td>
       <td>${i.date}</td>
-      <td>${i.worker || '-'}</td>
-      <td style="color:${resultColor}; font-weight:700;">${i.result}</td>
-      <td style="font-size:12px; color:var(--text2);">${i.memo || '-'}</td>
+      <td>${esc(i.worker || '-')}</td>
+      <td style="color:${resultColor}; font-weight:700;">${esc(i.result)}</td>
+      <td style="font-size:12px; color:var(--text2);">${esc(i.memo || '-')}</td>
       <td>${i.photo ? (i.photo.startsWith('http') ? `<a href="${i.photo}" target="_blank">🔗보기</a>` : i.photo) : '-'}</td>
       <td style="text-align:center;">
         <button class="btn btn-outline btn-sm" onclick="editInspection(${i.id})">수정</button>
@@ -2968,18 +3509,17 @@ function exportInspectionToExcel() {
 const CIV_KEY = 'office_civil';
 
 // 사진 첨부 시 Base64 변환 처리
+// [v50] 원본을 그대로 넣지 않고 compressImage()로 축소한 뒤 저장한다.
 document.addEventListener('change', function(e) {
   if (e.target && e.target.id === 'civ-file') {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        document.getElementById('civ-photo-base64').value = event.target.result;
-        document.getElementById('civ-preview').src = event.target.result;
-        document.getElementById('civ-preview-container').style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    }
+    handleImageUpload(file, (dataUrl, info) => {
+      document.getElementById('civ-photo-base64').value = dataUrl;
+      document.getElementById('civ-preview').src = dataUrl;
+      document.getElementById('civ-preview-container').style.display = 'block';
+      const hint = document.getElementById('civ-photo-info');
+      if (hint) hint.textContent = '🗜️ ' + info;
+    });
   }
 });
 
@@ -3099,18 +3639,18 @@ function renderCivil() {
     const prioClass = c.priority === '긴급' ? 'civ-prio-긴급' : '';
     
     tr.innerHTML = `
-      <td><span class="civ-status-${c.status}">${c.status}</span></td>
-      <td>${c.type}</td>
-      <td class="${prioClass}">${c.priority}</td>
+      <td><span class="civ-status-${esc(c.status)}">${esc(c.status)}</span></td>
+      <td>${esc(c.type)}</td>
+      <td class="${prioClass}">${esc(c.priority)}</td>
       <td>
-        <div style="font-weight:700;">${c.title}</div>
-        <div style="font-size:11px; color:var(--text2);">${c.memo || ''}</div>
+        <div style="font-weight:700;">${esc(c.title)}</div>
+        <div style="font-size:11px; color:var(--text2);">${esc(c.memo || '')}</div>
         ${c.photo ? `<span class="civ-photo-btn" onclick="viewCivPhoto('${c.id}')">🖼️ 사진보기</span>` : ''}
       </td>
-      <td>${c.requester}<br><span style="font-size:11px; color:var(--text2);">${c.contact || ''}</span></td>
+      <td>${esc(c.requester)}<br><span style="font-size:11px; color:var(--text2);">${esc(c.contact || '')}</span></td>
       <td>${c.regDate}</td>
       <td>${c.finishDate || '-'}</td>
-      <td>${c.worker || '-'}</td>
+      <td>${esc(c.worker || '-')}</td>
       <td style="text-align:center;">
         <button class="btn btn-outline btn-sm" onclick="editCivil(${c.id})">수정</button>
         <button class="btn btn-red btn-sm" onclick="deleteCivil(${c.id})">삭제</button>
@@ -3254,9 +3794,9 @@ function renderInventory() {
     const tr = document.createElement('tr');
     if (isShort) tr.className = 'inv-shortage';
     tr.innerHTML = `
-      <td>${i.cat || '-'}</td>
-      <td><div style="font-weight:700;">${i.name}</div><div style="font-size:11px; color:var(--text2);">${i.spec || ''}</div></td>
-      <td>${i.loc || '-'}</td>
+      <td>${esc(i.cat || '-')}</td>
+      <td><div style="font-weight:700;">${esc(i.name)}</div><div style="font-size:11px; color:var(--text2);">${esc(i.spec || '')}</div></td>
+      <td>${esc(i.loc || '-')}</td>
       <td style="text-align:right; font-weight:700;">${i.stock.toLocaleString()}</td>
       <td style="text-align:right; color:var(--text2);">${i.min.toLocaleString()}</td>
       <td><span class="${isShort ? 'inv-badge-short' : 'inv-badge-ok'}">${isShort ? '재고부족' : '정상'}</span></td>
@@ -3500,13 +4040,13 @@ function renderTemplateList() {
   const favorites = filtered.filter(t => t.fav);
   if (favorites.length > 0) {
     favSection.style.display = 'block';
-    favList.innerHTML = favorites.map(t => `<div class="tpl-item ${currentTplId === t.id ? 'active' : ''}" onclick="loadTemplate('${t.id}')"><span>📄 ${t.title}</span><span class="tpl-fav-star">★</span></div>`).join('');
+    favList.innerHTML = favorites.map(t => `<div class="tpl-item ${currentTplId === t.id ? 'active' : ''}" onclick="loadTemplate('${t.id}')"><span>📄 ${esc(t.title)}</span><span class="tpl-fav-star">★</span></div>`).join('');
   } else {
     favSection.style.display = 'none';
   }
 
   // 메인 목록 렌더링
-  mainList.innerHTML = filtered.map(t => `<div class="tpl-item ${currentTplId === t.id ? 'active' : ''}" onclick="loadTemplate('${t.id}')"><span>📄 ${t.title}</span><span style="font-size:10px; color:var(--text2);">${t.cat}</span></div>`).join('');
+  mainList.innerHTML = filtered.map(t => `<div class="tpl-item ${currentTplId === t.id ? 'active' : ''}" onclick="loadTemplate('${t.id}')"><span>📄 ${esc(t.title)}</span><span style="font-size:10px; color:var(--text2);">${esc(t.cat)}</span></div>`).join('');
 }
 
 function loadTemplate(id) {
@@ -3625,7 +4165,7 @@ function renderRecentList() {
   const list = document.getElementById('tpl-recent-list');
   
   const recentItems = recentIds.map(id => templates.find(t => t.id == id)).filter(Boolean);
-  list.innerHTML = recentItems.map(t => `<div class="tpl-item ${currentTplId === t.id ? 'active' : ''}" onclick="loadTemplate('${t.id}')"><span>📄 ${t.title}</span></div>`).join('');
+  list.innerHTML = recentItems.map(t => `<div class="tpl-item ${currentTplId === t.id ? 'active' : ''}" onclick="loadTemplate('${t.id}')"><span>📄 ${esc(t.title)}</span></div>`).join('');
 }
 // --- 문서서식관리 끝 ---
 
@@ -3695,16 +4235,16 @@ function renderInspectionTable() {
   tbody.innerHTML = '';
   
   legalData.filter(i => i.title.toLowerCase().includes(search) || i.vendor.toLowerCase().includes(search)).forEach(i => {
-    const dday = calculateDday(i.nextDate);
+    const dday = calculateLegalDday(i.nextDate);
     const ddayClass = dday <= 0 ? 'red' : dday <= 7 ? 'amber' : 'green';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><span class="badge" style="background:${getStatusColor(i.status)}; color:white;">${i.status}</span></td>
-      <td style="font-weight:700;">${i.title}</td><td>${i.cat}</td><td>${i.period}개월</td>
+      <td><span class="badge" style="background:${getStatusColor(i.status)}; color:white;">${esc(i.status)}</span></td>
+      <td style="font-weight:700;">${esc(i.title)}</td><td>${esc(i.cat)}</td><td>${i.period}개월</td>
       <td>${i.nextDate}</td><td><span class="d-day-badge ${ddayClass}">${dday === 0 ? 'D-Day' : dday > 0 ? 'D-'+dday : 'D+'+Math.abs(dday)}</span></td>
-      <td>${i.vendor}<br><span style="font-size:11px; color:var(--text2);">${i.worker}</span></td>
+      <td>${esc(i.vendor)}<br><span style="font-size:11px; color:var(--text2);">${esc(i.worker)}</span></td>
       <td style="text-align:center;">
-        <button class="btn btn-outline btn-sm" onclick="editInspection(${i.id})">수정</button>
+        <button class="btn btn-outline btn-sm" onclick="editLegalInspection(${i.id})">수정</button>
         <button class="btn btn-blue btn-sm" onclick="completeInspection(${i.id})">완료</button>
       </td>`;
     tbody.appendChild(tr);
@@ -3715,7 +4255,7 @@ function getStatusColor(s) {
   return s === '완료' ? 'var(--blue)' : s === '진행중' ? 'var(--amber)' : s === '연기' ? 'var(--red)' : 'var(--text2)';
 }
 
-function calculateDday(target) {
+function calculateLegalDday(target) {
   const today = new Date(); today.setHours(0,0,0,0);
   const targetDate = new Date(target); targetDate.setHours(0,0,0,0);
   return Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
@@ -3740,7 +4280,7 @@ function renderInspectionCalendar() {
     const events = legalData.filter(i => i.nextDate === dateStr);
     html += `<div class="legal-cal-day">
       <div style="font-weight:700;">${d}</div>
-      ${events.map(e => `<div class="legal-cal-event ${calculateDday(e.nextDate) <= 0 ? 'today' : 'soon'}" onclick="editInspection(${e.id})">${e.title}</div>`).join('')}
+      ${events.map(e => `<div class="legal-cal-event ${calculateLegalDday(e.nextDate) <= 0 ? 'today' : 'soon'}" onclick="editLegalInspection(${e.id})">${esc(e.title)}</div>`).join('')}
     </div>`;
   }
   html += '</div>';
@@ -3757,7 +4297,7 @@ function renderInspectionDashboard() {
   const thisYear = now.getFullYear();
 
   legalData.forEach(i => {
-    const dday = calculateDday(i.nextDate);
+    const dday = calculateLegalDday(i.nextDate);
     if (dday === 0) stats.today++;
     if (dday > 0 && dday <= 7) stats.soon++;
     if (dday < 0 && i.status !== '완료') stats.delay++;
@@ -3811,7 +4351,7 @@ function showInspectionNotification() {
   const notifArea = document.getElementById('legal-notifications');
   notifArea.innerHTML = '';
   legalData.forEach(i => {
-    const dday = calculateDday(i.nextDate);
+    const dday = calculateLegalDday(i.nextDate);
     if (dday <= 7 && i.status !== '완료') {
       const div = document.createElement('div');
       div.className = `legal-notif-item ${dday <= 0 ? 'urgent' : 'soon'}`;
@@ -3870,7 +4410,7 @@ function saveLegalInspection() {
   alert('저장되었습니다.');
 }
 
-function editInspection(id) {
+function editLegalInspection(id) {
   const i = legalData.find(item => item.id === id);
   if (!i) return;
   currentLegalId = id;
@@ -3905,16 +4445,41 @@ function completeInspection(id) {
   }
 }
 
+// [v50] 이미지는 자동 압축, 이미지가 아닌 파일(PDF 등)은 용량 상한을 두고 그대로 저장
+const LEGAL_FILE_MAX_KB = 800;
 function uploadInspectionFile(e) {
   const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (ev) => { legalFileBase64 = ev.target.result; document.getElementById('leg-file-preview').innerText = '파일 준비 완료'; };
-    reader.readAsDataURL(file);
+  if (!file) return;
+  const preview = document.getElementById('leg-file-preview');
+
+  if (/^image\//.test(file.type)) {
+    handleImageUpload(file, (dataUrl, info) => {
+      legalFileBase64 = dataUrl;
+      if (preview) preview.innerText = '파일 준비 완료 (' + info + ')';
+    });
+    return;
   }
+
+  if (file.size > LEGAL_FILE_MAX_KB * 1024) {
+    alert(
+      `⚠️ 이미지가 아닌 파일은 ${LEGAL_FILE_MAX_KB}KB까지만 첨부할 수 있습니다.\n` +
+      `현재 파일: ${Math.round(file.size / 1024)}KB\n\n` +
+      `브라우저 저장 공간(약 5MB) 한도 때문입니다.\n` +
+      `큰 문서는 구글 드라이브에 올린 뒤 메모란에 링크를 적어주세요.`
+    );
+    e.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    legalFileBase64 = ev.target.result;
+    if (preview) preview.innerText = `파일 준비 완료 (${Math.round(file.size / 1024)}KB)`;
+  };
+  reader.onerror = () => alert('❌ 파일을 읽지 못했습니다.');
+  reader.readAsDataURL(file);
 }
 
-function exportInspectionExcel() {
+function exportLegalInspectionExcel() {
   const rows = legalData.map(i => ({ '상태': i.status, '점검명': i.title, '분류': i.cat, '주기': i.period+'개월', '최근점검': i.lastDate, '다음점검': i.nextDate, '업체': i.vendor, '담당자': i.worker, '메모': i.memo }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
@@ -3927,7 +4492,7 @@ function printInspection() {
   win.document.write('<html><head><title>법정점검 현황</title><style>table{width:100%; border-collapse:collapse;} th,td{border:1px solid #ccc; padding:8px; text-align:left; font-size:12px;}</style></head><body>');
   win.document.write('<h2>법정 의무 점검 현황 보고서</h2>');
   win.document.write('<table><thead><tr><th>상태</th><th>점검명</th><th>분류</th><th>법정주기</th><th>다음점검일</th><th>업체</th><th>담당자</th></tr></thead><tbody>');
-  legalData.forEach(i => { win.document.write(`<tr><td>${i.status}</td><td>${i.title}</td><td>${i.cat}</td><td>${i.period}개월</td><td>${i.nextDate}</td><td>${i.vendor}</td><td>${i.worker}</td></tr>`); });
+  legalData.forEach(i => { win.document.write(`<tr><td>${esc(i.status)}</td><td>${esc(i.title)}</td><td>${esc(i.cat)}</td><td>${i.period}개월</td><td>${i.nextDate}</td><td>${esc(i.vendor)}</td><td>${esc(i.worker)}</td></tr>`); });
   win.document.write('</tbody></table></body></html>');
   win.document.close(); win.print();
 }
@@ -3938,7 +4503,7 @@ function searchInspection() { renderInspectionTable(); }
 function updateLegalDashIntegration() {
   const dashGrid = document.getElementById('dash-stat-grid');
   if (!dashGrid) return;
-  const todayCount = legalData.filter(i => calculateDday(i.nextDate) === 0).length;
+  const todayCount = legalData.filter(i => calculateLegalDday(i.nextDate) === 0).length;
   if (todayCount > 0) {
     const div = document.createElement('div');
     div.className = 'stat-card red';
@@ -3985,9 +4550,9 @@ function renderAssetList() {
     div.className = `asset-item ${currentAssetId === a.id ? 'active' : ''}`;
     div.onclick = () => selectAsset(a.id);
     div.innerHTML = `
-      <div class="title">${a.name}</div>
-      <div class="sub">📍 ${a.loc} | 🆔 ${a.code}</div>
-      <div style="margin-top:5px;"><span class="badge" style="background:var(--blue); font-size:10px;">${a.cat}</span></div>
+      <div class="title">${esc(a.name)}</div>
+      <div class="sub">📍 ${esc(a.loc)} | 🆔 ${esc(a.code)}</div>
+      <div style="margin-top:5px;"><span class="badge" style="background:var(--blue); font-size:10px;">${esc(a.cat)}</span></div>
     `;
     container.appendChild(div);
   });
@@ -4032,7 +4597,7 @@ function renderAssetTimeline(assetId) {
     <div class="timeline-item">
       <div class="date">${l.date} | ${l.user || '시스템'}</div>
       <div class="content">
-        <span class="type-badge" style="background:${getTimelineTypeColor(l.type)}">${l.type}</span>
+        <span class="type-badge" style="background:${getTimelineTypeColor(l.type)}">${esc(l.type)}</span>
         ${l.content}
       </div>
     </div>
@@ -4102,7 +4667,7 @@ function printAssetHistory() {
   const asset = assetData.find(a => a.id === currentAssetId);
   const win = window.open('', '_blank');
   win.document.write(`<html><head><title>${asset.name} 히스토리</title><style>body{padding:40px; font-family:sans-serif; line-height:1.6;} .header{border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:20px;} .timeline-item{margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;}</style></head><body>`);
-  win.document.write(`<div class="header"><h1>시설 자산 통합 이력 보고서</h1><p>시설명: ${asset.name} | 관리번호: ${asset.code} | 위치: ${asset.loc}</p></div>`);
+  win.document.write(`<div class="header"><h1>시설 자산 통합 이력 보고서</h1><p>시설명: ${esc(asset.name)} | 관리번호: ${esc(asset.code)} | 위치: ${esc(asset.loc)}</p></div>`);
   win.document.write(document.getElementById('asset-timeline').innerHTML);
   win.document.write(`</body></html>`);
   win.document.close(); win.print();
@@ -4275,8 +4840,8 @@ function renderTodayTasks() {
     list.innerHTML = tasks.map(t => `
       <div class="today-task-item">
         <input type="checkbox" onclick="completeTodayTask('${t.mod}', ${t.id})">
-        <span style="font-weight:700; color:var(--accent);">[${t.type}]</span>
-        <span style="flex:1;">${t.title}</span>
+        <span style="font-weight:700; color:var(--accent);">[${esc(t.type)}]</span>
+        <span style="flex:1;">${esc(t.title)}</span>
       </div>
     `).join('');
     document.getElementById('today-tasks-summary').innerText = `미완료 업무 ${tasks.length}건`;
@@ -4348,19 +4913,13 @@ function toggleNotifPanel() {
 
 function exportFullData() {
   try {
-    const backupData = {};
-    // 기존 저장 로직을 전혀 건드리지 않고, 현재 LocalStorage에 들어있는
-    // 모든 키-값을 그대로 순회하며 수집함 (add only, 결합도 최소화)
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      backupData[key] = localStorage.getItem(key);
-    }
-
+    // [v50] 스냅샷 생성 로직을 buildLocalSnapshot()으로 일원화
     const backupPayload = {
       appName: 'Apt-ONE 아파트원 ERP',
-      backupVersion: 1,
+      backupVersion: 2,
       exportedAt: new Date().toISOString(),
-      data: backupData
+      localChangedAt: getLocalChangedAt() || new Date().toISOString(),
+      data: buildLocalSnapshot()
     };
 
     const jsonStr = JSON.stringify(backupPayload, null, 2);
@@ -4388,6 +4947,23 @@ function exportFullData() {
   }
 }
 
+// ── [v50] 복구 직후 클라우드 반영 공통 처리 ──────────────────
+// 로그인 상태면 클라우드까지 갱신한 뒤 새로고침하고,
+// 로그인 상태가 아니면 그냥 새로고침한다. 어느 쪽이든 실패해도 복구 자체는 유지된다.
+function pushRestoredDataToCloud(message) {
+  if (typeof googleAccessToken !== 'undefined' && googleAccessToken) {
+    Promise.resolve(saveDataToGoogleDrive())
+      .catch(e => console.error('복구 후 클라우드 반영 실패:', e))
+      .finally(() => {
+        alert(message + '\n화면을 새로고침합니다.');
+        location.reload();
+      });
+  } else {
+    alert(message + '\n화면을 새로고침합니다.');
+    location.reload();
+  }
+}
+
 function importFullData(file) {
   if (!file) return;
 
@@ -4412,14 +4988,14 @@ function importFullData(file) {
         return;
       }
 
-      // 기존 LocalStorage를 지우고, 백업 파일의 데이터로 새로 덮어씀
-      localStorage.clear();
-      dataKeys.forEach(key => {
-        localStorage.setItem(key, parsed.data[key]);
-      });
+      // [v50] 기존 LocalStorage를 지우고 백업 내용으로 교체.
+      // applyCloudData()를 재사용해 복원 중 중복 동기화가 걸리지 않게 한다.
+      applyCloudData(parsed.data);
 
-      alert('✅ 데이터 복구가 완료되었습니다. 화면을 새로고침합니다.');
-      location.reload();
+      // ▼ [v50] 중요.
+      // 복구 직후 클라우드에 즉시 밀어 올리지 않으면, 클라우드에 남아 있던
+      // 예전 데이터가 다음 접속 때 더 최신으로 판정되어 복구를 되돌려버린다.
+      pushRestoredDataToCloud('✅ 데이터 복구가 완료되었습니다.');
     } catch (err) {
       console.error('importFullData 오류:', err);
       alert('❌ 백업 파일을 읽는 중 오류가 발생했습니다. 올바른 JSON 파일인지 확인해주세요.');
@@ -4528,11 +5104,44 @@ function initGapiClient() {
 // -----------------------------
 // 3) 로그인(연동) 버튼 클릭 시 실행
 // -----------------------------
+// [v50] 구글 로그인이 애초에 불가능한 환경인지 먼저 검사한다.
+// 구글은 OAuth 요청의 "출처(origin)"를 검사하는데, 파일을 직접 열면(file://)
+// 출처가 null이 되어 등록 자체가 불가능하고, 구글은 400 invalid_request로 막는다.
+// 이 경우 사용자에게는 원인 불명의 "액세스 차단됨" 화면만 보이므로 미리 안내한다.
+function getGoogleAuthBlockReason() {
+  const p = location.protocol;
+  if (p === 'file:') {
+    return '이 프로그램을 파일로 직접 열어서(file://) 실행 중이기 때문입니다.\n' +
+           '구글 로그인은 https:// 주소에서만 동작합니다.';
+  }
+  if (p !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    return `현재 주소가 ${p}// 로 시작하기 때문입니다.\n` +
+           '구글 로그인은 https:// 주소(또는 localhost)에서만 동작합니다.';
+  }
+  return null;
+}
+
 function connectGoogleDrive() {
   if (GOOGLE_CLIENT_ID.indexOf('여기에_발급받은') === 0) {
     alert('⚠️ 아직 구글 클라이언트 ID가 설정되지 않았습니다.\n개발자에게 문의해 GOOGLE_CLIENT_ID 값을 먼저 설정해달라고 요청해주세요.');
     return;
   }
+
+  const blocked = getGoogleAuthBlockReason();
+  if (blocked) {
+    alert(
+      '⚠️ 이 환경에서는 구글 드라이브 연동을 사용할 수 없습니다.\n\n' +
+      blocked + '\n\n' +
+      '그대로 진행하면 구글에서 "액세스 차단됨 / 400 invalid_request" 화면이 뜹니다.\n\n' +
+      '▶ 해결 방법\n' +
+      '인터넷 주소(https://...)로 접속해서 사용하세요.\n\n' +
+      '※ 연동 없이도 모든 기능은 정상 동작합니다.\n' +
+      '   다만 데이터가 이 컴퓨터에만 저장되므로,\n' +
+      '   [전체 데이터 백업(.json)]을 주기적으로 꼭 받아두세요.'
+    );
+    return;
+  }
+
   if (!googleTokenClient) {
     initGoogleAuth();
     setTimeout(() => {
@@ -4673,16 +5282,13 @@ async function saveBackupToGoogleDrive(silent) {
     return;
   }
   try {
-    const backupData = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      backupData[key] = localStorage.getItem(key);
-    }
+    // [v50] 스냅샷 생성 로직을 buildLocalSnapshot()으로 일원화 (동기화 메타키 제외)
     const payload = {
       appName: 'Apt-ONE 아파트원 ERP',
-      backupVersion: 1,
+      backupVersion: 2,
       exportedAt: new Date().toISOString(),
-      data: backupData
+      localChangedAt: getLocalChangedAt() || new Date().toISOString(),
+      data: buildLocalSnapshot()
     };
     const jsonStr = JSON.stringify(payload);
 
@@ -4756,13 +5362,11 @@ async function restoreBackupFromGoogleDrive() {
       return;
     }
 
-    localStorage.clear();
-    dataKeys.forEach(key => {
-      localStorage.setItem(key, parsed.data[key]);
-    });
-
-    alert('✅ 구글 드라이브에서 복원이 완료되었습니다. 화면을 새로고침합니다.');
-    location.reload();
+    // [v50] 복원 전 현재 로컬을 안전 백업 파일로 내려받아 되돌릴 여지를 남긴다
+    downloadLocalSafetyBackup();
+    applyCloudData(parsed.data);
+    // [v50] 실시간 동기화 파일에도 반영해야 다음 접속 때 복원이 되돌려지지 않는다
+    pushRestoredDataToCloud('✅ 구글 드라이브에서 복원이 완료되었습니다.\n(직전 데이터는 "apt_easy_안전백업_...json" 파일로 저장되었습니다.)');
   } catch (err) {
     console.error('restoreBackupFromGoogleDrive 오류:', err);
     alert('❌ 복원 중 오류가 발생했습니다: ' + err.message);
@@ -4839,18 +5443,29 @@ async function findDriveDbFileId() {
 //     - 네트워크 오류/토큰 만료 등으로 실패해도 절대 프로그램을 멈추지 않고,
 //       화면 우측 하단에 부드러운 경고 토스트만 띄움 (요청사항 3번)
 // -----------------------------
+// [v50] 동기화 대상 스냅샷을 만드는 공통 함수 (메타키는 제외)
+function buildLocalSnapshot() {
+  const snap = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (SYNC_EXCLUDE_KEYS.includes(key)) continue;
+    snap[key] = localStorage.getItem(key);
+  }
+  return snap;
+}
+
 async function saveDataToGoogleDrive() {
   if (!googleAccessToken) return; // 로그인 안 된 상태면 조용히 스킵 (LocalStorage에는 이미 정상 저장됨)
   try {
-    const backupData = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      backupData[key] = localStorage.getItem(key);
-    }
+    const backupData = buildLocalSnapshot();
     const payload = {
       appName: 'Apt-ONE 아파트원 ERP',
-      syncVersion: 1,
+      syncVersion: 2, // [v50] localChangedAt 도입으로 버전 상향
       syncedAt: new Date().toISOString(),
+      // ▼ [v50 수정 2번] 핵심.
+      // "언제 업로드했는가"가 아니라 "이 데이터가 마지막으로 수정된 시각이 언제인가"를 기록한다.
+      // 이 값이 있어야 클라우드와 로컬 중 무엇이 최신인지 판단할 수 있다.
+      localChangedAt: getLocalChangedAt() || new Date().toISOString(),
       data: backupData
     };
     const jsonStr = JSON.stringify(payload);
@@ -4894,49 +5509,153 @@ async function saveDataToGoogleDrive() {
 //     - 클라우드에 파일이 있으면: 클라우드 데이터가 로컬보다 우선 (요청사항 2번)
 //     - 클라우드에 파일이 없으면: 현재 로컬 데이터를 최초 업로드
 // -----------------------------
+// [v50] 사람이 읽을 수 있는 시각 표기
+function fmtDateTime(iso) {
+  if (!iso) return '알 수 없음';
+  const d = new Date(iso);
+  if (isNaN(d)) return '알 수 없음';
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ` +
+         `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// [v50] 클라우드 내용으로 로컬을 덮어쓰기 직전, 현재 로컬을 파일로 자동 저장해준다.
+// 판단이 잘못되더라도 사용자가 되돌릴 수 있는 마지막 안전줄.
+function downloadLocalSafetyBackup() {
+  try {
+    const payload = {
+      appName: 'Apt-ONE 아파트원 ERP',
+      backupVersion: 2,
+      note: '클라우드 데이터로 덮어쓰기 직전에 자동 생성된 안전 백업입니다.',
+      exportedAt: new Date().toISOString(),
+      data: buildLocalSnapshot()
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const now = new Date();
+    const stamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+    a.href = url;
+    a.download = `apt_easy_안전백업_${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return true;
+  } catch (e) {
+    console.error('안전 백업 생성 실패:', e);
+    return false;
+  }
+}
+
+// [v50] 클라우드 데이터를 로컬에 적용하는 실제 동작
+function applyCloudData(data) {
+  window.__isCloudRestoring__ = true; // 복원 중 재업로드(무한동기화) 방지
+  try {
+    localStorage.clear();
+    Object.keys(data).forEach(key => {
+      localStorage.setItem(key, data[key]);
+    });
+    markLocalChange(); // 복원 시점을 로컬 변경 시각으로 기록
+  } finally {
+    // 예외가 나더라도 플래그는 반드시 원복해야 이후 동기화가 영구히 멈추지 않는다.
+    window.__isCloudRestoring__ = false;
+  }
+}
+
+// ================================================================
+// [v50 수정 2번] 클라우드 우선 → "최신 우선 + 사용자 확인"으로 변경
+//
+// v49의 동작: 접속하면 무조건 클라우드가 로컬을 덮어씀.
+//   → 오프라인 상태에서 입력한 내용이 다음 접속 때 통째로 사라졌음.
+// v50의 동작:
+//   1) 내용이 같으면 아무것도 안 함
+//   2) 클라우드가 최신이면 → 양쪽 시각을 보여주고 사용자에게 물어봄
+//      (덮어쓰기 전에 로컬 안전백업 파일을 자동 다운로드)
+//   3) 로컬이 최신이면 → 로컬을 클라우드로 올림 (덮어쓰지 않음)
+//   4) 판단 불가(시각 정보 없음)면 → 반드시 물어봄
+// ================================================================
 async function loadDataFromGoogleDrive() {
   if (!googleAccessToken) return;
   try {
     const existing = await findDriveDbFileId();
 
-    if (existing) {
-      const res = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${existing.id}?alt=media`,
-        { headers: { Authorization: `Bearer ${googleAccessToken}` } }
-      );
-      if (!res.ok) throw new Error('클라우드 데이터 다운로드 실패 (HTTP ' + res.status + ')');
-      const parsed = await res.json();
-
-      if (!parsed || typeof parsed !== 'object' || !parsed.data || typeof parsed.data !== 'object') {
-        throw new Error('클라우드 데이터 형식이 올바르지 않습니다.');
-      }
-
-      // 현재 로컬 데이터와 완전히 동일하면 불필요한 새로고침을 생략함
-      const currentSnapshot = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        currentSnapshot[key] = localStorage.getItem(key);
-      }
-      const isSame = JSON.stringify(currentSnapshot) === JSON.stringify(parsed.data);
-      if (isSame) {
-        console.log('☁️ 클라우드 데이터가 로컬과 동일합니다. 동기화를 생략합니다.');
-        return;
-      }
-
-      // 클라우드 데이터가 로컬보다 우선순위를 가짐 → 로컬을 클라우드 내용으로 덮어씀
-      window.__isCloudRestoring__ = true; // 복원 중 재업로드(무한동기화) 방지
-      localStorage.clear();
-      Object.keys(parsed.data).forEach(key => {
-        localStorage.setItem(key, parsed.data[key]);
-      });
-      window.__isCloudRestoring__ = false;
-
-      alert('☁️ 구글 드라이브의 최신 데이터를 불러왔습니다. 화면을 새로고침합니다.');
-      location.reload();
-    } else {
+    if (!existing) {
       // 드라이브에 아직 동기화 파일이 없다면, 현재 로컬 데이터를 최초 업로드
       await saveDataToGoogleDrive();
       console.log('☁️ 구글 드라이브에 초기 데이터를 업로드했습니다.');
+      return;
+    }
+
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${existing.id}?alt=media`,
+      { headers: { Authorization: `Bearer ${googleAccessToken}` } }
+    );
+    if (!res.ok) throw new Error('클라우드 데이터 다운로드 실패 (HTTP ' + res.status + ')');
+    const parsed = await res.json();
+
+    if (!parsed || typeof parsed !== 'object' || !parsed.data || typeof parsed.data !== 'object') {
+      throw new Error('클라우드 데이터 형식이 올바르지 않습니다.');
+    }
+
+    // ── 1) 내용이 완전히 같으면 아무 일도 하지 않는다 ──
+    const localSnapshot = buildLocalSnapshot();
+    if (JSON.stringify(localSnapshot) === JSON.stringify(parsed.data)) {
+      console.log('☁️ 클라우드와 로컬이 동일합니다. 동기화를 생략합니다.');
+      return;
+    }
+
+    // ── 2) 최신 판정 ──
+    const cloudTime = parsed.localChangedAt || parsed.syncedAt || existing.modifiedTime || null;
+    const localTime = getLocalChangedAt();
+    const localIsEmpty = Object.keys(localSnapshot).length === 0;
+
+    // 로컬이 완전히 비어 있으면(새 PC 첫 접속) 물어볼 것 없이 클라우드를 받는다.
+    if (localIsEmpty) {
+      applyCloudData(parsed.data);
+      alert('☁️ 구글 드라이브의 데이터를 불러왔습니다. 화면을 새로고침합니다.');
+      location.reload();
+      return;
+    }
+
+    let cloudIsNewer;
+    if (cloudTime && localTime) {
+      cloudIsNewer = new Date(cloudTime).getTime() > new Date(localTime).getTime();
+    } else {
+      cloudIsNewer = null; // 판단 불가 → 사용자에게 물어본다
+    }
+
+    // ── 3) 로컬이 더 최신이면 클라우드를 갱신하고 끝 (절대 덮어쓰지 않는다) ──
+    if (cloudIsNewer === false) {
+      console.log('☁️ 로컬이 더 최신입니다. 클라우드를 로컬 기준으로 갱신합니다.');
+      await saveDataToGoogleDrive();
+      return;
+    }
+
+    // ── 4) 클라우드가 최신이거나 판단 불가 → 사용자에게 확인 ──
+    const msg = (cloudIsNewer === null)
+      ? '⚠️ 클라우드와 이 컴퓨터의 데이터가 서로 다릅니다.\n' +
+        '어느 쪽이 최신인지 자동으로 판단할 수 없습니다.\n\n' +
+        `· 클라우드 최종 수정: ${fmtDateTime(cloudTime)}\n` +
+        `· 이 컴퓨터 최종 수정: ${fmtDateTime(localTime)}\n\n` +
+        '[확인] 클라우드 내용을 가져옵니다 (이 컴퓨터 내용은 대체됨)\n' +
+        '[취소] 이 컴퓨터 내용을 유지합니다 (클라우드로 올림)\n\n' +
+        '※ [확인]을 누르면 현재 이 컴퓨터의 데이터가 백업 파일로 먼저 자동 저장됩니다.'
+      : '☁️ 클라우드에 더 최신 데이터가 있습니다.\n\n' +
+        `· 클라우드 최종 수정: ${fmtDateTime(cloudTime)}\n` +
+        `· 이 컴퓨터 최종 수정: ${fmtDateTime(localTime)}\n\n` +
+        '[확인] 클라우드 내용을 가져옵니다 (이 컴퓨터 내용은 대체됨)\n' +
+        '[취소] 이 컴퓨터 내용을 유지합니다 (클라우드로 올림)\n\n' +
+        '※ [확인]을 누르면 현재 이 컴퓨터의 데이터가 백업 파일로 먼저 자동 저장됩니다.';
+
+    if (confirm(msg)) {
+      downloadLocalSafetyBackup(); // 되돌릴 수 있는 안전줄을 먼저 확보
+      applyCloudData(parsed.data);
+      alert('☁️ 클라우드 데이터를 불러왔습니다.\n(직전 데이터는 "apt_easy_안전백업_...json" 파일로 저장되었습니다.)\n\n화면을 새로고침합니다.');
+      location.reload();
+    } else {
+      console.log('☁️ 사용자가 로컬 유지를 선택했습니다. 로컬을 클라우드로 올립니다.');
+      await saveDataToGoogleDrive();
+      alert('✅ 이 컴퓨터의 데이터를 유지하고, 클라우드에 반영했습니다.');
     }
   } catch (err) {
     console.error('loadDataFromGoogleDrive 오류:', err);
