@@ -5579,10 +5579,22 @@ function downloadLocalSafetyBackup() {
 function applyCloudData(data) {
   window.__isCloudRestoring__ = true; // 복원 중 재업로드(무한동기화) 방지
   try {
+    // [v50] 로그인 상태 표시는 "이 기기(브라우저)의 상태"이지 백업할 데이터가 아니다.
+    // clear()로 함께 지워지면 복원 후 자동 재로그인이 안 돼서 로그아웃된 것처럼 보인다.
+    // 그래서 clear() 전에 따로 보관했다가 복원한다.
+    let keepLinked = null;
+    try { keepLinked = __nativeGetItem('apt_google_linked'); } catch (e) {}
+
     localStorage.clear();
     Object.keys(data).forEach(key => {
+      // 백업 안에 이 표시가 섞여 있더라도(구버전 백업 등) 무시한다
+      if (SYNC_EXCLUDE_KEYS.includes(key)) return;
       localStorage.setItem(key, data[key]);
     });
+
+    if (keepLinked !== null) {
+      try { __nativeSetItem('apt_google_linked', keepLinked); } catch (e) {}
+    }
     markLocalChange(); // 복원 시점을 로컬 변경 시각으로 기록
   } finally {
     // 예외가 나더라도 플래그는 반드시 원복해야 이후 동기화가 영구히 멈추지 않는다.
