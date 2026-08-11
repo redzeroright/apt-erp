@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>아파트관리업무(APT-EASY)ERP V50.BETA</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- [v50] 법정점검 화면의 원형·막대 그래프용 Chart.js.
+     이 줄이 빠져 있어서 "Chart.js not loaded yet" 경고가 뜨고 그래프가 안 그려졌음. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
 <!-- ============================================================ -->
 <!-- 🔒 2단계 안전망: 구글 드라이브 자동 백업용 구글 API 스크립트        -->
@@ -2718,21 +2721,11 @@ window.onload = () => {
   </div>
 </div>
     <style>
-  #donation-banner {
-    display: none;
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 10px 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    font-size: 14px;
-  }
+  /* [v50] #donation-banner CSS 제거 — 배너 자체를 없앴습니다. */
 </style>
 
-<div id="donation-banner">☕ 커피 한 잔 후원으로 개발자를 응원해주세요!</div>
+<!-- [v50] 우클릭 시 뜨던 donation-banner 제거.
+     후원은 하단의 [☕ 커피한잔후원] 버튼으로 일원화했습니다. -->
 
 <script>
 // ================================================================
@@ -3100,14 +3093,10 @@ function scheduleCloudSync() {
 }
 // --- 실시간 동기화 저장 감시 패치(5단계) 끝 ---
 
-  document.addEventListener('contextmenu', function(event) {
-    event.preventDefault();
-    const banner = document.getElementById('donation-banner');
-    banner.style.display = 'block';
-    setTimeout(() => {
-      banner.style.display = 'none';
-    }, 3000); // 3초 후 자동 숨김
-  });
+  // [v50] 우클릭 차단 제거.
+  // 원래 소스보기 금지 목적이었으나 브라우저 특성상 Ctrl+U·F12·view-source로
+  // 얼마든지 열려 실효성이 없고, 오히려 직원의 복사/붙여넣기만 방해했습니다.
+  // 후원은 화면 하단에 항상 떠 있는 [☕ 커피한잔후원] 버튼이 대신합니다.
 
 // --- 업무일정관리 (Add Only) ---
 const SCHED_KEY = 'office_schedule';
@@ -4343,8 +4332,27 @@ function renderInspectionDashboard() {
     });
   } else {
     console.warn('Chart.js not loaded yet.');
-    document.getElementById('legal-chart-pie').parentElement.innerHTML = '<p style="text-align:center; padding-top:80px; color:var(--text2);">차트 라이브러리 로드 중...</p>';
+    // [v50] 예전에는 캔버스의 부모 div를 innerHTML로 덮어써서 캔버스가 사라졌고,
+    // 그러면 재시도해도 캔버스를 못 찾아 그래프가 영영 안 나왔다.
+    // 캔버스는 그대로 두고, 별도 안내 문구만 잠깐 얹는다.
+    const pie = document.getElementById('legal-chart-pie');
+    if (pie && !document.getElementById('legal-chart-loading')) {
+      const note = document.createElement('p');
+      note.id = 'legal-chart-loading';
+      note.style.cssText = 'text-align:center;color:var(--text2);font-size:13px;margin:8px 0;';
+      note.textContent = '차트 라이브러리 로드 중...';
+      pie.parentElement.appendChild(note);
+    }
+    // 외부 스크립트(Chart.js)가 아직 안 왔을 수 있으므로 잠시 후 한 번 다시 시도한다.
+    if (!window.__legalChartRetried) {
+      window.__legalChartRetried = true;
+      setTimeout(() => { if (typeof Chart !== 'undefined') { try { renderInspectionDashboard(); } catch (e) {} } }, 1500);
+    }
+    return;
   }
+  // 차트가 정상적으로 그려졌으면 로딩 안내는 제거
+  const loadingNote = document.getElementById('legal-chart-loading');
+  if (loadingNote) loadingNote.remove();
 }
 
 function showInspectionNotification() {
