@@ -4950,17 +4950,44 @@ function exportFullData() {
 // ── [v50] 복구 직후 클라우드 반영 공통 처리 ──────────────────
 // 로그인 상태면 클라우드까지 갱신한 뒤 새로고침하고,
 // 로그인 상태가 아니면 그냥 새로고침한다. 어느 쪽이든 실패해도 복구 자체는 유지된다.
+// ── [v50] 복원 직후 처리 ─────────────────────────────────────
+// 예전에는 여기서 location.reload()로 페이지를 새로고침했는데,
+// 새로고침을 하면 메모리에 있던 구글 로그인 토큰이 사라지고,
+// 그 뒤 "조용한 자동 재로그인"이 실패해서 로그아웃된 것처럼 보였다.
+// → 새로고침하지 않고, 메모리 배열을 다시 읽어들이고 화면만 다시 그린다.
+//   이렇게 하면 로그인 상태가 그대로 유지된다.
+function reloadInMemoryFromStorage() {
+  // window.onload에서 하던 초기화 중 "데이터 로드"에 해당하는 부분만 다시 수행
+  gymData    = JSON.parse(localStorage.getItem(KEYS.GYM)    || '[]');
+  parkData   = JSON.parse(localStorage.getItem(KEYS.PARK)   || '[]');
+  lockerData = JSON.parse(localStorage.getItem(KEYS.LOCKER) || '[]');
+  dbData     = JSON.parse(localStorage.getItem(KEYS.DB)     || '[]');
+  try { cfg = JSON.parse(localStorage.getItem(KEYS.CFG)) || cfg; } catch (e) {}
+  migrateData();   // 복원된 데이터에 id/기준일이 없으면 채운다
+  rebuildDongs();  // 동 드롭다운 재생성
+}
+
+function refreshCurrentView() {
+  // 현재 열려 있는 페이지를 찾아서 그 페이지만 다시 그린다
+  const active = document.querySelector('.page.active');
+  let name = 'dash';
+  if (active && active.id && active.id.indexOf('page-') === 0) name = active.id.slice(5);
+  try { showPage(name); } catch (e) { console.error('화면 갱신 오류:', e); }
+  try { if (typeof loadSettings === 'function' && document.getElementById('page-settings') && document.getElementById('page-settings').classList.contains('active')) loadSettings(); } catch (e) {}
+}
+
 function pushRestoredDataToCloud(message) {
+  // 1) 새로고침 없이 메모리·화면을 갱신 → 로그인 유지
+  reloadInMemoryFromStorage();
+  refreshCurrentView();
+
+  // 2) 로그인 상태면 복원 내용을 클라우드에도 반영 (다음 접속 때 복원이 되돌려지지 않도록)
   if (typeof googleAccessToken !== 'undefined' && googleAccessToken) {
     Promise.resolve(saveDataToGoogleDrive())
       .catch(e => console.error('복구 후 클라우드 반영 실패:', e))
-      .finally(() => {
-        alert(message + '\n화면을 새로고침합니다.');
-        location.reload();
-      });
+      .finally(() => alert(message + '\n\n로그인 상태는 그대로 유지됩니다.'));
   } else {
-    alert(message + '\n화면을 새로고침합니다.');
-    location.reload();
+    alert(message);
   }
 }
 
@@ -5652,8 +5679,9 @@ async function loadDataFromGoogleDrive() {
     // 로컬이 완전히 비어 있으면(새 PC 첫 접속) 물어볼 것 없이 클라우드를 받는다.
     if (localIsEmpty) {
       applyCloudData(parsed.data);
-      alert('☁️ 구글 드라이브의 데이터를 불러왔습니다. 화면을 새로고침합니다.');
-      location.reload();
+      reloadInMemoryFromStorage();
+      refreshCurrentView();
+      alert('☁️ 구글 드라이브의 데이터를 불러왔습니다.');
       return;
     }
 
@@ -5690,8 +5718,9 @@ async function loadDataFromGoogleDrive() {
     if (confirm(msg)) {
       downloadLocalSafetyBackup(); // 되돌릴 수 있는 안전줄을 먼저 확보
       applyCloudData(parsed.data);
-      alert('☁️ 클라우드 데이터를 불러왔습니다.\n(직전 데이터는 "apt_easy_안전백업_...json" 파일로 저장되었습니다.)\n\n화면을 새로고침합니다.');
-      location.reload();
+      reloadInMemoryFromStorage();
+      refreshCurrentView();
+      alert('☁️ 클라우드 데이터를 불러왔습니다.\n(직전 데이터는 "apt_easy_안전백업_...json" 파일로 저장되었습니다.)');
     } else {
       console.log('☁️ 사용자가 로컬 유지를 선택했습니다. 로컬을 클라우드로 올립니다.');
       await saveDataToGoogleDrive();
